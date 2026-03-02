@@ -1,8 +1,7 @@
 use crate::{Context, Error};
 use poise::serenity_prelude as serenity;
 
-use ::serenity::all::Mentionable;
-use serenity::all::CreateEmbedAuthor;
+use serenity::all::{CreateEmbedAuthor, Mentionable};
 use serenity::builder::CreateEmbed;
 
 /// Bens one or more users

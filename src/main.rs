@@ -21,6 +21,7 @@ async fn main() {
                 commands::age::age(),
                 commands::ping::ping(),
                 commands::ben::ben(),
+                commands::calc::calc(),
             ],
             prefix_options: poise::PrefixFrameworkOptions {
                 prefix: Some("!".into()),
