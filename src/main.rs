@@ -1,46 +1,54 @@
+mod commands;
+
+use poise::serenity_prelude as serenity;
 use std::env;
 
-use serenity::async_trait;
-use serenity::model::channel::Message;
-use serenity::prelude::*;
-
-struct Handler;
-
-#[async_trait]
-impl EventHandler for Handler {
-    async fn message(&self, ctx: Context, msg: Message) {
-        if msg.author.bot {
-            return;
-        }
-
-        if msg.content == "!ping" {
-            if let Err(why) = msg.channel_id.say(&ctx.http, "Pong!").await {
-                println!("Error sending message: {why:?}");
-            }
-        }
-    }
-}
+pub struct Data {} // User data, which is stored and accessible in all command invocations
+pub type Error = Box<dyn std::error::Error + Send + Sync>;
+pub type Context<'a> = poise::Context<'a, Data, Error>;
 
 #[tokio::main]
 async fn main() {
-    // Load env variables
-    dotenvy::dotenv().ok();
+    dotenvy::dotenv().expect("Failed to load .env file");
 
-    // Login with a bot token from the environment
-    let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
-    // Set gateway intents, which decides what events the bot will be notified about
-    let intents = GatewayIntents::GUILD_MESSAGES
-        | GatewayIntents::DIRECT_MESSAGES
-        | GatewayIntents::MESSAGE_CONTENT;
+    let token = env::var("DISCORD_TOKEN").expect("missing DISCORD_TOKEN");
+    let intents =
+        serenity::GatewayIntents::non_privileged() | serenity::GatewayIntents::MESSAGE_CONTENT;
 
-    // Create a new instance of the Client, logging in as a bot.
-    let mut client = Client::builder(&token, intents)
-        .event_handler(Handler)
-        .await
-        .expect("Err creating client");
+    let framework = poise::Framework::builder()
+        .options(poise::FrameworkOptions {
+            commands: vec![
+                commands::age::age(),
+                commands::ping::ping(),
+                commands::ben::ben(),
+            ],
+            prefix_options: poise::PrefixFrameworkOptions {
+                prefix: Some("!".into()),
+                ..Default::default()
+            },
+            ..Default::default()
+        })
+        .setup(|ctx, _ready, framework| {
+            Box::pin(async move {
+                let guild_id_str = env::var("GUILD_ID").expect("missing GUILD_ID");
+                let guild_id = guild_id_str.parse::<u64>().expect("invalid GUILD_ID");
 
-    // Start listening for events by starting a single shard
-    if let Err(why) = client.start().await {
-        println!("Client error: {why:?}");
-    }
+                poise::builtins::register_in_guild(
+                    ctx,
+                    &framework.options().commands,
+                    serenity::GuildId::new(guild_id),
+                )
+                .await?;
+
+                println!("Registered commands to guild: {}", guild_id);
+                println!("Logged in as username: {}", _ready.user.name);
+                Ok(Data {})
+            })
+        })
+        .build();
+
+    let client = serenity::ClientBuilder::new(token, intents)
+        .framework(framework)
+        .await;
+    client.unwrap().start().await.unwrap();
 }
