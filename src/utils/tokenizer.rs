@@ -72,6 +72,10 @@ pub fn tokenizer(input: &str) -> Vec<Token> {
                 tokens.push(Token::RightBracket);
                 chars.next();
             }
+            '^' => {
+                tokens.push(Token::Exponent);
+                chars.next();
+            }
             ' ' | '\n' | '\t' => {
                 chars.next();
             }

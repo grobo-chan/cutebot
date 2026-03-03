@@ -125,6 +125,11 @@ pub fn processor(input: Vec<Token>) -> f64 {
                 let b = stack.pop().expect("Invalid RPN!");
                 stack.push(b / a);
             }
+            Token::Exponent => {
+                let a = stack.pop().expect("Invalid RPN!");
+                let b = stack.pop().expect("Invalid RPN!");
+                stack.push(b.powf(a));
+            }
             _ => {
                 panic!("Invalid RPN!");
             }

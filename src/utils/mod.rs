@@ -9,6 +9,7 @@ pub enum Token {
     Minus,
     Multiply,
     Divide,
+    Exponent,
     LeftBracket,
     RightBracket,
 }
@@ -18,6 +19,7 @@ impl Token {
         match self {
             Token::Plus | Token::Minus => 1,
             Token::Multiply | Token::Divide => 2,
+            Token::Exponent => 3,
             _ => 0,
         }
     }
