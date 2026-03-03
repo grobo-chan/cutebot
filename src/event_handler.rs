@@ -1,7 +1,7 @@
 use crate::{Data, Error};
 use ::serenity::all::{CreateMessage, Mentionable};
 use poise::serenity_prelude as serenity;
-use serenity::builder::CreateEmbed;
+use serenity::builder::{CreateEmbed, EditChannel};
 
 use rand::RngExt;
 use std::env;
@@ -62,6 +62,14 @@ pub async fn event_handler(
 
                 let builder = CreateMessage::new().embed(embed);
                 new_message.channel_id.send_message(ctx, builder).await?;
+            }
+        }
+        serenity::FullEvent::ChannelUpdate { old: _, new } => {
+            if new.id == court_channel {
+                let desc = "This text channel is the legal property of Telescope Grobo **ONLY**.\n It can do whatever it wants here and you must legally comply.";
+                court_channel
+                    .edit(ctx, EditChannel::new().topic(desc))
+                    .await?;
             }
         }
         _ => {}
