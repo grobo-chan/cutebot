@@ -1,9 +1,14 @@
 mod commands;
+mod event_handler;
 
 use poise::serenity_prelude as serenity;
 use std::env;
 
-pub struct Data {} // User data, which is stored and accessible in all command invocations
+use crate::event_handler::event_handler;
+
+// User data, which is stored and accessible in all command invocations
+pub struct Data {}
+
 pub type Error = Box<dyn std::error::Error + Send + Sync>;
 pub type Context<'a> = poise::Context<'a, Data, Error>;
 
@@ -27,6 +32,9 @@ async fn main() {
                 prefix: Some("!".into()),
                 ..Default::default()
             },
+            event_handler: |ctx, event, framework, data| {
+                Box::pin(event_handler(ctx, event, framework, data))
+            },
             ..Default::default()
         })
         .setup(|ctx, _ready, framework| {
@@ -41,8 +49,6 @@ async fn main() {
                 )
                 .await?;
 
-                println!("Registered commands to guild: {}", guild_id);
-                println!("Logged in as username: {}", _ready.user.name);
                 Ok(Data {})
             })
         })
