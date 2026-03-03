@@ -30,14 +30,17 @@ pub async fn ben(
         })
         .unwrap_or_else(|| ":loading:".to_string());
 
-    let embed = CreateEmbed::new().author(embed_author).description(format!(
-        "**Benning:**\n {}",
-        users
-            .iter()
-            .map(|x| { format!("- {} {}", x.mention(), loading_emoji) })
-            .collect::<Vec<_>>()
-            .join("\n")
-    ));
+    let embed = CreateEmbed::new()
+        .author(embed_author)
+        .colour(serenity::Colour::DARK_GREEN)
+        .description(format!(
+            "**Benning:**\n {}",
+            users
+                .iter()
+                .map(|x| { format!("- {} {}", x.mention(), loading_emoji) })
+                .collect::<Vec<_>>()
+                .join("\n")
+        ));
 
     let reply = poise::CreateReply::default().embed(embed);
     ctx.send(reply).await?;

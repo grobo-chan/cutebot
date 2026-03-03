@@ -50,12 +50,13 @@ pub async fn event_handler(
                             "{} has been timed out for 10 minutes",
                             new_message.author.mention()
                         )),
-                    Err(_) => CreateEmbed::new()
+                    Err(e) => CreateEmbed::new()
                         .title("A Landmine failed to explode")
                         .colour(serenity::Colour::LIGHT_GREY)
                         .description(format!(
-                            "{} is safe... probably because they're a mod",
-                            new_message.author.mention()
+                            "{} is safe... probably because {}",
+                            new_message.author.mention(),
+                            e
                         )),
                 };
 

@@ -1,5 +1,6 @@
 mod commands;
 mod event_handler;
+mod utils;
 
 use poise::serenity_prelude as serenity;
 use std::env;
