@@ -28,6 +28,7 @@ async fn main() {
                 commands::ping::ping(),
                 commands::ben::ben(),
                 commands::calc::calc(),
+                commands::temp::temp(),
             ],
             prefix_options: poise::PrefixFrameworkOptions {
                 prefix: Some("!".into()),
