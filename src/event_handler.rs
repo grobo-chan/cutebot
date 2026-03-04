@@ -6,7 +6,7 @@ use serenity::builder::{CreateEmbed, EditChannel};
 use rand::prelude::*;
 use std::env;
 
-const DESC: &str = "This text channel is the legal property of Telescope Grobo **ONLY**.\n It can do whatever it wants here and you must legally comply.";
+const DESC: &str = "This text channel HAS A BILLION LANDMINES YOU WILL EXPLODE.\n (1/6 chance of a 10min timeout unless you mod.)";
 const COURT_CHANNEL_ID: serenity::ChannelId = serenity::ChannelId::new(1450186078249291866);
 
 pub async fn event_handler(
@@ -15,7 +15,7 @@ pub async fn event_handler(
     _framework: poise::FrameworkContext<'_, Data, Error>,
     _data: &Data,
 ) -> Result<(), Error> {
-    let num = rand::rng().random_range(1..=20);
+    let num = rand::rng().random_range(1..=6);
 
     match event {
         serenity::FullEvent::Ready { data_about_bot, .. } => {

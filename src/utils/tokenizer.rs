@@ -31,7 +31,7 @@ pub async fn tokenizer(input: &str) -> Vec<Token> {
                     chars.next();
                     let sides = consume_numbers(&mut chars).await;
                     let dice = Token::Dice {
-                        count: first_num as u32,
+                        count: first_num as u8,
                         sides: sides as u32,
                     };
                     tokens.push(dice);
@@ -43,7 +43,7 @@ pub async fn tokenizer(input: &str) -> Vec<Token> {
                 chars.next();
                 let sides = consume_numbers(&mut chars).await;
                 let dice = Token::Dice {
-                    count: 1 as u32,
+                    count: 1 as u8,
                     sides: sides as u32,
                 };
                 tokens.push(dice);

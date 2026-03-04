@@ -8,7 +8,7 @@ pub mod tokenizer;
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum Token {
     Number(f64),
-    Dice { count: u32, sides: u32 },
+    Dice { count: u8, sides: u32 },
     Plus,
     Minus,
     Multiply,
