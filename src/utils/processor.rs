@@ -1,8 +1,8 @@
 use super::Token;
-use rand::RngExt;
-use std::collections::VecDeque;
+use crate::utils::tokenizer::tokenizer;
+use rand::prelude::*;
 
-fn dice_to_num(dice: Token) -> Token {
+async fn dice_to_num(dice: Token) -> Token {
     if let Token::Dice { count, sides } = dice {
         let mut s: f64 = 0.0;
         let mut rng = rand::rng();
@@ -17,26 +17,22 @@ fn dice_to_num(dice: Token) -> Token {
     }
 }
 
-fn convert_to_rpn(input: Vec<Token>) -> Vec<Token> {
-    let mut output_queue: VecDeque<Token> = VecDeque::new();
+async fn convert_to_rpn(input: Vec<Token>) -> Vec<Token> {
+    let mut output_queue: Vec<Token> = Vec::new();
     let mut operator_stack: Vec<Token> = Vec::new();
-    let mut tokens = input.iter().peekable();
 
-    while let Some(&token) = tokens.peek() {
+    for token in input {
         match token {
-            Token::Dice { count, sides } => {
-                output_queue.push_front(dice_to_num(Token::Dice {
-                    count: *count,
-                    sides: *sides,
-                }));
+            Token::Dice { .. } => {
+                output_queue.push(dice_to_num(token).await);
             }
 
-            Token::Number(n) => {
-                output_queue.push_front(Token::Number(*n));
+            Token::Number(_) => {
+                output_queue.push(token);
             }
 
             Token::LeftBracket => {
-                operator_stack.push(Token::LeftBracket);
+                operator_stack.push(token);
             }
 
             Token::RightBracket => {
@@ -45,7 +41,7 @@ fn convert_to_rpn(input: Vec<Token>) -> Vec<Token> {
                         break;
                     }
 
-                    output_queue.push_front(operator_stack.pop().expect("Mismatched Brackets"));
+                    output_queue.push(operator_stack.pop().expect("Mismatched Brackets"));
                 }
 
                 if operator_stack.pop().is_none() {
@@ -58,16 +54,15 @@ fn convert_to_rpn(input: Vec<Token>) -> Vec<Token> {
                     if top_token != &Token::LeftBracket
                         && top_token.precedence() >= token.precedence()
                     {
-                        output_queue
-                            .push_front(operator_stack.pop().expect("Something went wrong"));
+                        output_queue.push(operator_stack.pop().expect("Something went wrong"));
+                    } else {
+                        break;
                     }
                 }
 
-                operator_stack.push(*token);
+                operator_stack.push(token);
             }
         }
-
-        tokens.next();
     }
 
     while let Some(top_token) = operator_stack.last() {
@@ -75,30 +70,27 @@ fn convert_to_rpn(input: Vec<Token>) -> Vec<Token> {
             panic!("Mismatched Brackets");
         }
 
-        output_queue.push_front(operator_stack.pop().expect("Something went wrong"));
+        output_queue.push(operator_stack.pop().expect("Something went wrong"));
     }
 
-    let mut output_vec = Vec::from(output_queue);
-    output_vec.reverse();
-    output_vec
+    output_queue
 }
 
-pub fn processor(input: Vec<Token>) -> f64 {
-    let rpn = convert_to_rpn(input);
-    let mut stack: Vec<f64> = Vec::new();
+fn print_token_vec(input: &Vec<Token>) {
+    for token in input {
+        print!("{} ", token);
+    }
+    println!();
+}
 
-    // for token in &rpn {
-    //     let char = match token {
-    //         Token::Number(n) => format!("{}", n),
-    //         Token::Plus => String::from("+"),
-    //         Token::Minus => String::from("-"),
-    //         Token::Multiply => String::from("*"),
-    //         Token::Divide => String::from("/"),
-    //         _ => String::from("@"),
-    //     };
-    //     print!("{} ", char);
-    // }
-    // println!();
+pub async fn processor(expr: &str) -> f64 {
+    let input = tokenizer(expr).await;
+    print!("Expression: ");
+    print_token_vec(&input);
+    let rpn = convert_to_rpn(input).await;
+    print!("RPN: ");
+    print_token_vec(&rpn);
+    let mut stack: Vec<f64> = Vec::new();
 
     for token in rpn {
         match token {

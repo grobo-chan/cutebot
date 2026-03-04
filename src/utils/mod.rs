@@ -1,3 +1,6 @@
+use std::fmt;
+use std::fmt::Display;
+
 pub mod conversions;
 pub mod processor;
 pub mod tokenizer;
@@ -23,5 +26,23 @@ impl Token {
             Token::Exponent => 3,
             _ => 0,
         }
+    }
+}
+
+impl Display for Token {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let ch = match self {
+            Token::Dice { count, sides } => format!("{}d{}", *count, *sides),
+            Token::Number(n) => format!("{}", *n),
+            Token::Plus => "+".to_string(),
+            Token::Minus => "-".to_string(),
+            Token::Multiply => "*".to_string(),
+            Token::Divide => "/".to_string(),
+            Token::Exponent => "^".to_string(),
+            Token::LeftBracket => "(".to_string(),
+            Token::RightBracket => ")".to_string(),
+        };
+
+        write!(f, "{}", ch)
     }
 }

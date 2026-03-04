@@ -3,8 +3,11 @@ use ::serenity::all::{CreateMessage, Mentionable};
 use poise::serenity_prelude as serenity;
 use serenity::builder::{CreateEmbed, EditChannel};
 
-use rand::RngExt;
+use rand::prelude::*;
 use std::env;
+
+const DESC: &str = "This text channel is the legal property of Telescope Grobo **ONLY**.\n It can do whatever it wants here and you must legally comply.";
+const COURT_CHANNEL_ID: serenity::ChannelId = serenity::ChannelId::new(1450186078249291866);
 
 pub async fn event_handler(
     ctx: &serenity::Context,
@@ -12,15 +15,18 @@ pub async fn event_handler(
     _framework: poise::FrameworkContext<'_, Data, Error>,
     _data: &Data,
 ) -> Result<(), Error> {
-    let court_channel = serenity::ChannelId::new(1450186078249291866);
     let num = rand::rng().random_range(1..=20);
 
     match event {
         serenity::FullEvent::Ready { data_about_bot, .. } => {
-            println!("Logged in as {}", data_about_bot.user.name)
+            println!("Logged in as {}", data_about_bot.user.name);
+
+            COURT_CHANNEL_ID
+                .edit(ctx, EditChannel::new().topic(DESC))
+                .await?;
         }
         serenity::FullEvent::Message { new_message } => {
-            if !new_message.author.bot && new_message.channel_id == court_channel && num == 1 {
+            if !new_message.author.bot && new_message.channel_id == COURT_CHANNEL_ID && num == 1 {
                 let seconds = 600; // 10 minute timeout
 
                 let until = serenity::Timestamp::from_unix_timestamp(
@@ -65,10 +71,9 @@ pub async fn event_handler(
             }
         }
         serenity::FullEvent::ChannelUpdate { old: _, new } => {
-            if new.id == court_channel {
-                let desc = "This text channel is the legal property of Telescope Grobo **ONLY**.\n It can do whatever it wants here and you must legally comply.";
-                court_channel
-                    .edit(ctx, EditChannel::new().topic(desc))
+            if new.id == COURT_CHANNEL_ID {
+                COURT_CHANNEL_ID
+                    .edit(ctx, EditChannel::new().topic(DESC))
                     .await?;
             }
         }

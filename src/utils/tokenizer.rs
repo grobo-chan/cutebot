@@ -1,6 +1,6 @@
 use super::Token;
 
-fn consume_numbers(chars: &mut std::iter::Peekable<std::str::Chars>) -> f64 {
+async fn consume_numbers(chars: &mut std::iter::Peekable<std::str::Chars<'_>>) -> f64 {
     let mut number_str = String::new();
     let mut has_decimal = false;
 
@@ -18,18 +18,18 @@ fn consume_numbers(chars: &mut std::iter::Peekable<std::str::Chars>) -> f64 {
     number_str.parse().unwrap_or(0.0)
 }
 
-pub fn tokenizer(input: &str) -> Vec<Token> {
+pub async fn tokenizer(input: &str) -> Vec<Token> {
     let mut tokens = Vec::new();
     let mut chars = input.chars().peekable();
 
     while let Some(&c) = chars.peek() {
         match c {
             '0'..='9' | '.' => {
-                let first_num = consume_numbers(&mut chars);
+                let first_num = consume_numbers(&mut chars).await;
 
                 if chars.peek() == Some(&'d') {
                     chars.next();
-                    let sides = consume_numbers(&mut chars);
+                    let sides = consume_numbers(&mut chars).await;
                     let dice = Token::Dice {
                         count: first_num as u32,
                         sides: sides as u32,
@@ -41,7 +41,7 @@ pub fn tokenizer(input: &str) -> Vec<Token> {
             }
             'd' => {
                 chars.next();
-                let sides = consume_numbers(&mut chars);
+                let sides = consume_numbers(&mut chars).await;
                 let dice = Token::Dice {
                     count: 1 as u32,
                     sides: sides as u32,
