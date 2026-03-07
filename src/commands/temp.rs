@@ -37,35 +37,35 @@ pub async fn temp(
 
     let mut invalid = false;
     match unit.to_lowercase().as_str() {
-        "celsius" => {
+        "celsius" | "c" => {
             temp.celsius = number;
             temp.fahrenheit = conversions::celsius::to_fahrenheit(number);
             temp.rankine = conversions::celsius::to_rankine(number);
             temp.kelvin = conversions::celsius::to_kelvin(number);
             temp.reaumur = conversions::celsius::to_reaumur(number);
         }
-        "fahrenheit" => {
+        "fahrenheit" | "f" => {
             temp.celsius = conversions::fahrenheit::to_celsius(number);
             temp.fahrenheit = number;
             temp.rankine = conversions::fahrenheit::to_rankine(number);
             temp.kelvin = conversions::fahrenheit::to_kelvin(number);
             temp.reaumur = conversions::fahrenheit::to_reaumur(number);
         }
-        "rankine" => {
+        "rankine" | "r" => {
             temp.celsius = conversions::rankine::to_celsius(number);
             temp.fahrenheit = conversions::rankine::to_fahrenheit(number);
             temp.rankine = number;
             temp.kelvin = conversions::rankine::to_kelvin(number);
             temp.reaumur = conversions::rankine::to_reaumur(number);
         }
-        "kelvin" => {
+        "kelvin" | "k" => {
             temp.celsius = conversions::kelvin::to_celsius(number);
             temp.fahrenheit = conversions::kelvin::to_fahrenheit(number);
             temp.rankine = conversions::kelvin::to_rankine(number);
             temp.kelvin = number;
             temp.reaumur = conversions::kelvin::to_reaumur(number);
         }
-        "reaumur" => {
+        "reaumur" | "re" => {
             temp.celsius = conversions::reaumur::to_celsius(number);
             temp.fahrenheit = conversions::reaumur::to_fahrenheit(number);
             temp.rankine = conversions::reaumur::to_rankine(number);
