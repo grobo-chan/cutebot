@@ -1,4 +1,4 @@
-use super::Token;
+use crate::utils::token::Token;
 use crate::utils::tokenizer::tokenizer;
 use rand::prelude::*;
 

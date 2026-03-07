@@ -1,4 +1,4 @@
-use super::Token;
+use crate::utils::token::Token;
 
 async fn consume_numbers(chars: &mut std::iter::Peekable<std::str::Chars<'_>>) -> f64 {
     let mut number_str = String::new();
