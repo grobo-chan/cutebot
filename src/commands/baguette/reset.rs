@@ -1,19 +1,9 @@
 use crate::{Context, Error};
 
 use poise::serenity_prelude as serenity;
+use serenity::builder::{CreateEmbed, CreateEmbedAuthor};
+use sqlx::Sqlite;
 use sqlx::query_builder::QueryBuilder;
-use sqlx::{Execute, Sqlite};
-
-/// The Parent Baguette Command
-#[poise::command(
-    slash_command,
-    prefix_command,
-    subcommands("reset"),
-    subcommand_required
-)]
-pub async fn baguette(_: Context<'_>) -> Result<(), Error> {
-    Ok(())
-}
 
 /// Sets everyone at 100 baguettes
 #[poise::command(slash_command, prefix_command, required_permissions = "ADMINISTRATOR")]
@@ -49,12 +39,23 @@ pub async fn reset(ctx: Context<'_>) -> Result<(), Error> {
     query_builder.push(';');
 
     let query = query_builder.build();
-    let query_str: String = query.sql().into();
-
-    println!("{}", query_str);
     query.execute(&ctx.data().database).await?;
 
-    ctx.say(format!("{}", query_str)).await?;
+    let embed_author =
+        CreateEmbedAuthor::new(&format!("Requested by: {}", ctx.author().display_name())).icon_url(
+            ctx.author()
+                .avatar_url()
+                .unwrap_or_else(|| ctx.author().default_avatar_url()),
+        );
+
+    let embed = CreateEmbed::new()
+        .title("Economy successfully reset")
+        .colour(serenity::Colour::DARK_GREEN)
+        .author(embed_author)
+        .description("The Baguette economy has now been reset.");
+
+    let reply = poise::CreateReply::default().embed(embed);
+    ctx.send(reply).await?;
 
     Ok(())
 }
