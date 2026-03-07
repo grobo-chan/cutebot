@@ -21,6 +21,8 @@
         clippy
         rustfmt
         rust-analyzer
+        sqlx-cli
+        sqlite
       ];
 
       nativeBuildInputs = [pkgs.pkg-config];
