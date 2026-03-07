@@ -1,10 +1,12 @@
 use crate::{Data, Error};
-use ::serenity::all::{CreateMessage, Mentionable};
+use futures::StreamExt;
 use poise::serenity_prelude as serenity;
-use serenity::builder::{CreateEmbed, EditChannel};
+use serenity::all::{Mentionable, ReactionType};
+use serenity::builder::{CreateButton, CreateEmbed, CreateMessage, EditChannel};
 
 use rand::prelude::*;
 use std::env;
+use std::time::Duration;
 
 const DESC: &str = "This text channel HAS A BILLION LANDMINES YOU WILL EXPLODE.\n (1/6 chance of a 10min timeout unless you mod.)";
 const COURT_CHANNEL_ID: serenity::ChannelId = serenity::ChannelId::new(1450186078249291866);
@@ -66,8 +68,20 @@ pub async fn event_handler(
                         )),
                 };
 
-                let builder = CreateMessage::new().embed(embed);
-                new_message.channel_id.send_message(ctx, builder).await?;
+                let builder = CreateMessage::new().embed(embed).button(
+                    CreateButton::new("Delete").emoji("🗑️".parse::<ReactionType>().unwrap()),
+                );
+
+                let m = new_message.channel_id.send_message(ctx, builder).await?;
+
+                let mut interaction_stream = m
+                    .await_component_interaction(&ctx.shard)
+                    .timeout(Duration::from_secs(60 * 3))
+                    .stream();
+
+                while let Some(_interaction) = interaction_stream.next().await {
+                    m.delete(&ctx).await.unwrap();
+                }
             }
         }
         serenity::FullEvent::ChannelUpdate { old: _, new } => {
