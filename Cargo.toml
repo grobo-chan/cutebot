@@ -2,6 +2,12 @@
 name = "cutebot"
 version = "0.1.0"
 edition = "2024"
+authors = ["Grobochan"]
+description = "A silly discord bot made by Grobochan for her server"
+repository = "https://github.com/grobo-chan/cutebot"
+license = "MIT"
+license-file = "LICENSE.txt"
+readme = "README.md"
 
 [dependencies]
 dotenvy = "0.15.7"
