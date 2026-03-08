@@ -1,4 +1,4 @@
-pub mod reset;
+mod reset;
 
 use crate::commands::baguette::reset::reset;
 use crate::{Context, Error};
