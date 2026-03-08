@@ -61,16 +61,7 @@ async fn main() {
         })
         .setup(|ctx, _ready, framework| {
             Box::pin(async move {
-                let guild_id_str = env::var("GUILD_ID").expect("missing GUILD_ID");
-                let guild_id = guild_id_str.parse::<u64>().expect("invalid GUILD_ID");
-
-                poise::builtins::register_in_guild(
-                    ctx,
-                    &framework.options().commands,
-                    serenity::GuildId::new(guild_id),
-                )
-                .await?;
-
+                poise::builtins::register_globally(ctx, &framework.options().commands).await?;
                 Ok(Data { database: database })
             })
         })

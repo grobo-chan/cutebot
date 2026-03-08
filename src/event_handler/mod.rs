@@ -10,6 +10,7 @@ use serenity::builder::EditChannel;
 
 const DESC: &str = "This text channel HAS A BILLION LANDMINES YOU WILL EXPLODE.\n (1/6 chance of a 10min timeout unless you mod.)";
 const COURT_CHANNEL_ID: serenity::ChannelId = serenity::ChannelId::new(1450186078249291866);
+const POS_ANNOYING_CHANNEL_ID: serenity::ChannelId = serenity::ChannelId::new(942627172705779863);
 
 pub async fn event_handler(
     ctx: &serenity::Context,
@@ -29,7 +30,11 @@ pub async fn event_handler(
                 .await?;
         }
         serenity::FullEvent::Message { new_message } => {
-            if !new_message.author.bot && new_message.channel_id == COURT_CHANNEL_ID && num == 1 {
+            if !new_message.author.bot
+                && (new_message.channel_id == COURT_CHANNEL_ID
+                    || new_message.channel_id == POS_ANNOYING_CHANNEL_ID)
+                && num == 1
+            {
                 landmine(new_message, ctx).await?;
             }
         }
