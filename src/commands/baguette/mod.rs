@@ -1,5 +1,7 @@
+pub mod leaderboard;
 mod reset;
 
+use crate::commands::baguette::leaderboard::leaderboard;
 use crate::commands::baguette::reset::reset;
 use crate::{Context, Error};
 
@@ -7,7 +9,7 @@ use crate::{Context, Error};
 #[poise::command(
     slash_command,
     prefix_command,
-    subcommands("reset"),
+    subcommands("reset", "leaderboard"),
     subcommand_required
 )]
 pub async fn baguette(_: Context<'_>) -> Result<(), Error> {

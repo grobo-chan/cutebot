@@ -1,3 +1,4 @@
+use crate::commands::baguette::leaderboard::update_channel;
 use crate::{Context, Error};
 
 use poise::serenity_prelude as serenity;
@@ -57,5 +58,6 @@ pub async fn reset(ctx: Context<'_>) -> Result<(), Error> {
     let reply = poise::CreateReply::default().embed(embed);
     ctx.send(reply).await?;
 
+    update_channel(&ctx).await?;
     Ok(())
 }

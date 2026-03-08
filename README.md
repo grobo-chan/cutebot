@@ -8,10 +8,11 @@ Silly discord bot made by Grobochan for her private server
 - [ ] Temperature Commands
   - [x] Conversion
   - [ ] Get temperature of a location
+  - [ ] Have the temperature actually be real (See [#1](https://github.com/grobo-chan/cutebot/issues/1))
 - [ ] Gluten-Free Baguette Commands
   - [x] Initiliaze/Reset the economy
   - [x] Give people 100 baguettes on joining 
-  - [ ] Add a leaderboard
+  - [x] Add a leaderboard
   - [ ] Add baguette trading
   - [ ] 1 daily baguette
   - [ ] Baking baguettes

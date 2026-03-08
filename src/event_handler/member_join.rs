@@ -6,7 +6,7 @@ pub async fn member_join(new_member: &serenity::all::Member, data: &Data) -> Res
     let user_id = new_member.user.id.get();
     let mut query_builder: QueryBuilder<Sqlite> =
         QueryBuilder::new("INSERT OR IGNORE INTO balance (user_id, money) VALUES");
-    query_builder.push(format!(" ({}, 100) ", user_id));
+    query_builder.push(format!(" ({}, 100);", user_id));
 
     let query = query_builder.build();
     query.execute(&data.database).await?;
