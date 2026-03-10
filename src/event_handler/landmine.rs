@@ -4,7 +4,6 @@ use futures::StreamExt;
 use poise::serenity_prelude as serenity;
 use serenity::all::{Mentionable, ReactionType};
 use serenity::builder::{CreateButton, CreateEmbed, CreateMessage};
-use std::env;
 use std::time::Duration;
 
 pub async fn landmine(
@@ -20,9 +19,7 @@ pub async fn landmine(
             + seconds) as i64,
     )?;
 
-    let guild_id_str = env::var("GUILD_ID").expect("missing GUILD_ID");
-    let guild_id_num = guild_id_str.parse::<u64>().expect("invalid GUILD_ID");
-    let guild_id = serenity::GuildId::new(guild_id_num);
+    let guild_id = new_message.guild_id.ok_or("Not in a guild")?;
     let mut member = guild_id.member(ctx, new_message.author.id).await?;
 
     let result = member
