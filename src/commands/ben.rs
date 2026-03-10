@@ -1,3 +1,4 @@
+use crate::utils::fetch_emote::fetch_emote;
 use crate::{Context, Error};
 use poise::serenity_prelude as serenity;
 
@@ -17,18 +18,7 @@ pub async fn ben(
                 .unwrap_or_else(|| ctx.author().default_avatar_url()),
         );
 
-    let app_emojis = ctx.http().get_application_emojis().await?;
-    let loading_emoji = app_emojis
-        .iter()
-        .find(|e| e.name == "loading")
-        .map(|e| {
-            if e.animated {
-                format!("<a:{}:{}>", e.name, e.id)
-            } else {
-                format!("<:{}:{}>", e.name, e.id)
-            }
-        })
-        .unwrap_or_else(|| ":loading:".to_string());
+    let loading_emoji = fetch_emote(&ctx.http(), "loading".to_string()).await?;
 
     let embed = CreateEmbed::new()
         .author(embed_author)

@@ -25,7 +25,9 @@ pub async fn landmine(
     let result = member
         .edit(
             ctx,
-            serenity::EditMember::new().disable_communication_until_datetime(until),
+            serenity::EditMember::new()
+                .disable_communication_until_datetime(until)
+                .audit_log_reason("A landmine exploded"),
         )
         .await;
 
