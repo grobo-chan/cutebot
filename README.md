@@ -5,6 +5,7 @@ Silly discord bot made by Grobochan for her frens
 - [x] Calculator with a dice
 - [x] Landmines (1/6 chance of 10min timeout) in the #gl_talking_here channel
 - [x] A cute little secret ;)
+- [x] The ability to download emojis 
 - [ ] Some settings file with all the channel ids 
 - [ ] Temperature Commands
   - [x] Conversion

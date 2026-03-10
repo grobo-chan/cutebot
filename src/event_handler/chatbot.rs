@@ -17,6 +17,10 @@ pub async fn chatbot(
     .iter()
     .any(|&x| new_message.content.to_lowercase().as_str().contains(x));
 
+    let asked_pronouns = vec!["what are your pronouns", "what r ur pronouns"]
+        .iter()
+        .any(|&x| new_message.content.to_lowercase().as_str().contains(x));
+
     if has_rel_keywords {
         let cgahq_bot = serenity::UserId::new(1468954832764276856);
         let guild_id = new_message.guild_id.ok_or("Not in a guild")?;
@@ -51,6 +55,16 @@ pub async fn chatbot(
                 new_message.reply_ping(&ctx.http, "No lol").await?;
             }
         }
+    } else if asked_pronouns {
+        let letsu_emote = fetch_emote(&ctx.http, "letsu".to_string()).await?;
+        new_message.reply(&ctx.http, "i go by it/its").await?;
+        new_message
+            .channel_id
+            .send_message(
+                &ctx.http,
+                CreateMessage::new().content(format!("{}", letsu_emote)),
+            )
+            .await?;
     }
 
     Ok(())

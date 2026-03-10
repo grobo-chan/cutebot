@@ -63,6 +63,7 @@ async fn main() {
                 commands::calc::calc(),
                 commands::temp::temp(),
                 commands::baguette::baguette(),
+                commands::getemote::getemote(),
             ],
             prefix_options: poise::PrefixFrameworkOptions {
                 prefix: Some("!".into()),
