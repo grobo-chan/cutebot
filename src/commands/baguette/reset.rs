@@ -1,38 +1,59 @@
 use crate::commands::baguette::leaderboard::update_channel;
 use crate::{Context, Error};
 
+use ::serenity::all::Member;
 use poise::serenity_prelude as serenity;
 use serenity::builder::{CreateEmbed, CreateEmbedAuthor};
-use sqlx::Sqlite;
 use sqlx::query_builder::QueryBuilder;
+use sqlx::{Execute, Sqlite};
 
-/// Sets everyone at 100 baguettes
-#[poise::command(slash_command, prefix_command, required_permissions = "ADMINISTRATOR")]
+/// Initiliazes/Reset the economy by setting everyone at 100 baguettes
+#[poise::command(
+    slash_command,
+    prefix_command,
+    required_permissions = "MANAGE_GUILD",
+    aliases("init")
+)]
 pub async fn reset(ctx: Context<'_>) -> Result<(), Error> {
-    sqlx::query!("DELETE FROM balance;")
-        .execute(&ctx.data().database)
-        .await
-        .unwrap();
-
-    sqlx::query!("DELETE FROM transactions;")
-        .execute(&ctx.data().database)
-        .await
-        .unwrap();
-
     let guild_id = ctx.guild_id().ok_or("Not in a guild")?;
+
+    let mut settings_query_builder: QueryBuilder<Sqlite> = QueryBuilder::new(format!(
+        "INSERT OR IGNORE INTO servers (server_id, leaderboard_channel, gambling_enabled) VALUES ({}, NULL, 0);",
+        guild_id.get()
+    ));
+
+    let settings_query = settings_query_builder.build();
+    println!("{}", settings_query.sql());
+    settings_query.execute(&ctx.data().database).await?;
+
+    let mut delete_query_builder: QueryBuilder<Sqlite> = QueryBuilder::new(format!(
+        "DELETE FROM balance WHERE server_id = {id}; DELETE FROM transactions WHERE server_id = {id};",
+        id = guild_id.get()
+    ));
+
+    let delete_query = delete_query_builder.build();
+    println!("{}", delete_query.sql());
+    delete_query.execute(&ctx.data().database).await?;
+
     let members = guild_id.members(&ctx, Some(100), None).await?;
 
     let mut query_builder: QueryBuilder<Sqlite> =
-        QueryBuilder::new("INSERT INTO balance (user_id, money) VALUES\n");
+        QueryBuilder::new("INSERT INTO balance (user_id, server_id, baguettes) VALUES\n");
 
     let mut i = 1;
-    let len = members.len();
-    for member in members {
-        if !member.user.bot {
-            query_builder.push(format!("({}, 100)", member.user.id.get()));
-            if i < len {
-                query_builder.push(",\n");
-            }
+    let users = members
+        .iter()
+        .filter(|&x| !x.user.bot)
+        .collect::<Vec<&Member>>();
+    let len = users.len();
+    for member in users {
+        query_builder.push(format!(
+            "({}, {}, 100)",
+            member.user.id.get(),
+            guild_id.get()
+        ));
+        if i < len {
+            query_builder.push(",\n");
         }
 
         i += 1;
@@ -40,6 +61,7 @@ pub async fn reset(ctx: Context<'_>) -> Result<(), Error> {
     query_builder.push(';');
 
     let query = query_builder.build();
+    println!("{}", query.sql());
     query.execute(&ctx.data().database).await?;
 
     let embed_author =
