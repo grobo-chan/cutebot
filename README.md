@@ -15,6 +15,7 @@ Silly discord bot made by Grobochan for her frens
   - [x] Initiliaze/Reset the economy
   - [x] Give people 100 baguettes on joining 
   - [x] Add a leaderboard
+    - [x] Pagination 
   - [ ] Add baguette trading
   - [ ] 1 daily baguette
   - [ ] Baking baguettes
@@ -28,6 +29,8 @@ Silly discord bot made by Grobochan for her frens
 - [ ] Add a Complex Pat Command
 - [ ] Add custom Role Colors (with hex codes)
 - [ ] Add Cards against humanity
+- [ ] 8ball
+- [ ] More mod commands
 
 ## LICENSE
 All the code is under the MIT License. Please see [./LICENSE.txt](./LICENSE.txt) for more info.

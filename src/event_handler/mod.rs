@@ -1,10 +1,12 @@
 mod chatbot;
 mod landmine;
 mod member_join;
+mod update_leaderboard;
 
 use crate::event_handler::chatbot::chatbot;
 use crate::event_handler::landmine::landmine;
 use crate::event_handler::member_join::member_join;
+use crate::event_handler::update_leaderboard::update_channel;
 use crate::{Data, Error};
 use poise::serenity_prelude as serenity;
 use rand::prelude::*;
@@ -23,6 +25,27 @@ pub async fn event_handler(
             println!("Logged in as {}", data_about_bot.user.name);
         }
         serenity::FullEvent::Message { new_message } => {
+            let cgahq_bot_id = 1468954832764276856;
+
+            if new_message.author.id.get() == cgahq_bot_id {
+                if new_message.content
+                    == String::from("obviously im literally the best bot ever made, trust")
+                {
+                    new_message.reply(&ctx.http, "no me").await?;
+                }
+            }
+
+            match ctx.http.get_current_application_info().await {
+                Ok(info) => {
+                    if let Some(guild_id) = new_message.guild_id {
+                        if new_message.application_id == Some(info.id) {
+                            update_channel(guild_id, ctx, data).await?;
+                        }
+                    }
+                }
+                Err(e) => panic!("Error while fetching app info: {:?}", e),
+            }
+
             if new_message.author.bot {
                 return Ok(());
             }
