@@ -1,7 +1,7 @@
 use crate::{Context, Data, Error};
 
 use poise::serenity_prelude as serenity;
-use serenity::all::{CacheHttp, Mentionable, UserId};
+use serenity::all::{Mentionable, UserId};
 use sqlx::{QueryBuilder, Row, Sqlite};
 
 pub async fn get_pages(guild_id: serenity::GuildId, data: &Data) -> Result<Vec<String>, Error> {
@@ -20,7 +20,7 @@ pub async fn get_pages(guild_id: serenity::GuildId, data: &Data) -> Result<Vec<S
         let baguettes: u64 = row.try_get("baguettes")?;
         page.push_str(format!("{}. {} {}\n", i + 1, UserId::new(id).mention(), baguettes).as_str());
 
-        if ((i + 1) % 10 == 0) | (i == l - 1) {
+        if ((i + 1) % 10 == 0) | (i + 1 == l) {
             pages.push(page.clone());
             page = String::new();
         }

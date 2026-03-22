@@ -14,8 +14,8 @@ pub async fn chatbot(
         vec![
             "you in a relationship",
             "u in a relationship",
-            "are you dating",
-            "r u dating",
+            "you dating",
+            "u dating",
         ],
     )
     .await?

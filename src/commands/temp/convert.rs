@@ -1,9 +1,9 @@
+use crate::commands::temp::Temp;
 use crate::utils::conversions;
 use crate::{Context, Error};
 
 use futures::{Stream, StreamExt};
 use poise::serenity_prelude as serenity;
-use serenity::all::CreateEmbedAuthor;
 use serenity::builder::CreateEmbed;
 
 async fn autocomplete<'a>(_ctx: Context<'_>, partial: &'a str) -> impl Stream<Item = String> {
@@ -12,19 +12,11 @@ async fn autocomplete<'a>(_ctx: Context<'_>, partial: &'a str) -> impl Stream<It
         .map(|name| name.to_string())
 }
 
-struct Temp {
-    celsius: f64,
-    fahrenheit: f64,
-    rankine: f64,
-    kelvin: f64,
-    reaumur: f64,
-}
-
 /// Converts temperatures to show up in other units
 #[poise::command(slash_command, prefix_command)]
-pub async fn temp(
+pub async fn convert(
     ctx: Context<'_>,
-    number: f64,
+    number: f32,
     #[autocomplete = "autocomplete"] unit: String,
 ) -> Result<(), Error> {
     let mut temp = Temp {
@@ -78,22 +70,32 @@ pub async fn temp(
     };
 
     let embed_author =
-        CreateEmbedAuthor::new(&format!("Requested by: {}", ctx.author().display_name())).icon_url(
-            ctx.author()
-                .avatar_url()
-                .unwrap_or_else(|| ctx.author().default_avatar_url()),
-        );
+        serenity::CreateEmbedAuthor::new(&format!("Requested by: {}", ctx.author().display_name()))
+            .icon_url(
+                ctx.author()
+                    .avatar_url()
+                    .unwrap_or_else(|| ctx.author().default_avatar_url()),
+            );
 
     if !invalid {
-        let embed = CreateEmbed::new()
+        let note = {
+            if temp.kelvin < 0.0 {
+                "Note: This temperature is below 0 K. Zero Kelvin is the absolute zero, the hypothetical temperature at which the atoms themself stop moving. From the third law of thermodynamics it is impossible to reach it with finite steps."
+            } else if temp.kelvin > 1.4e32 {
+                "Note: This temperature is above 1.4 × 10³²K. The Planck Temperature is the theoretical maximum temperature possible given our current understanding of physics. Over that temperature the thermal radiation wavelength would be smaller than the Planck Length, the smallest allowed length in our current model of physics"
+            } else {
+                ""
+            }
+        };
+
+        let embed = serenity::CreateEmbed::new()
             .author(embed_author)
             .colour(serenity::Colour::DARK_MAGENTA)
             .title("Temperature")
             .description(format!(
-                "The temperature is:\n- {}°C\n- {}°F\n- {} R\n- {} K\n- {} r",
-                temp.celsius, temp.fahrenheit, temp.rankine, temp.kelvin, temp.reaumur
+                "The temperature is:\n- {}°C\n- {}°F\n- {} R\n- {} K\n- {} r\n{}",
+                temp.celsius, temp.fahrenheit, temp.rankine, temp.kelvin, temp.reaumur, note
             ));
-
         let reply = poise::CreateReply::default().embed(embed);
         ctx.send(reply).await?;
     } else {

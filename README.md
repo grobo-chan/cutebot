@@ -7,10 +7,10 @@ Silly discord bot made by Grobochan for her frens
 - [x] A cute little secret ;)
 - [x] The ability to download emojis 
 - [ ] Some settings file with all the channel ids 
-- [ ] Temperature Commands
+- [x] Temperature Commands
   - [x] Conversion
-  - [ ] Get temperature of a location
-  - [ ] Have the temperature actually be real (See [#1](https://github.com/grobo-chan/cutebot/issues/1))
+  - [x] Get temperature of a location
+  - [x] Have the temperature actually be real (See [#1](https://github.com/grobo-chan/cutebot/issues/1))
 - [ ] Gluten-Free Baguette Commands
   - [x] Initiliaze/Reset the economy
   - [x] Give people 100 baguettes on joining 
