@@ -1,3 +1,8 @@
+/*
+Copyright (C) 2026 GroboChan
+Please see README.md and LICENSE.txt for more information
+*/
+
 use crate::utils::token::Token;
 
 async fn consume_numbers(chars: &mut std::iter::Peekable<std::str::Chars<'_>>) -> f64 {

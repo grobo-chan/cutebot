@@ -1,3 +1,8 @@
+/*
+Copyright (C) 2026 GroboChan
+Please see README.md and LICENSE.txt for more information
+*/
+
 pub mod celsius {
     pub fn to_fahrenheit(value: f32) -> f32 {
         return value * 1.8 + 32.0;

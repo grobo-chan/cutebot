@@ -5,7 +5,7 @@ edition = "2024"
 authors = ["Grobochan"]
 description = "A silly discord bot made by Grobochan for her server"
 repository = "https://github.com/grobo-chan/cutebot"
-license-file = "LICENSE.txt"
+license = "AGPL-3.0-only"
 readme = "README.md"
 
 [dependencies]

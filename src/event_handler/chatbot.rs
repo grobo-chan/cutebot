@@ -1,3 +1,8 @@
+/*
+Copyright (C) 2026 GroboChan
+Please see README.md and LICENSE.txt for more information
+*/
+
 use crate::event_handler::msg_has_keywords;
 use crate::utils::fetch_emote::fetch_emote;
 use crate::{Error, event_handler::CGAHQ_BOT_ID};

@@ -1,3 +1,8 @@
+/*
+Copyright (C) 2026 GroboChan
+Please see README.md and LICENSE.txt for more information
+*/
+
 use crate::utils::fetch_emote::fetch_emote;
 use crate::{Context, Error};
 use poise::serenity_prelude as serenity;

@@ -1,4 +1,8 @@
-// use crate::commands::baguette::leaderboard::update_channel;
+/*
+Copyright (C) 2026 GroboChan
+Please see README.md and LICENSE.txt for more information
+*/
+
 use crate::{Context, Error};
 
 use ::serenity::all::Member;
@@ -80,6 +84,5 @@ pub async fn reset(ctx: Context<'_>) -> Result<(), Error> {
     let reply = poise::CreateReply::default().embed(embed);
     ctx.send(reply).await?;
 
-    // update_channel(&ctx).await?;
     Ok(())
 }

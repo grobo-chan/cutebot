@@ -1,3 +1,8 @@
+/*
+Copyright (C) 2026 GroboChan
+Please see README.md and LICENSE.txt for more information
+*/
+
 mod chatbot;
 mod landmine;
 mod member_join;

@@ -33,7 +33,20 @@ Silly discord bot made by Grobochan for her frens
 - [ ] More mod commands
 
 ## LICENSE
-All the code is under the MIT NON-AI License. Please see [./LICENSE.txt](./LICENSE.txt) for more info.
+Copyright (C) 2026 GroboChan
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 ## CREDITS
 - [GroboChan](https://github.com/grobo-chan): Did all the coding
