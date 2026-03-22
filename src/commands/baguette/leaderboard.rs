@@ -15,14 +15,12 @@ pub async fn get_pages(guild_id: serenity::GuildId, data: &Data) -> Result<Vec<S
 
     let mut pages: Vec<String> = vec![];
     let mut page = String::new();
-    let mut i = 0;
-    for row in rows {
-        i += 1;
+    for (i, row) in rows.iter().enumerate() {
         let id: u64 = row.try_get("user_id")?;
         let baguettes: u64 = row.try_get("baguettes")?;
-        page.push_str(format!("{}. {} {}\n", i, UserId::new(id).mention(), baguettes).as_str());
+        page.push_str(format!("{}. {} {}\n", i + 1, UserId::new(id).mention(), baguettes).as_str());
 
-        if (i % 10 == 0) | (i == l) {
+        if ((i + 1) % 10 == 0) | (i == l - 1) {
             pages.push(page.clone());
             page = String::new();
         }
@@ -31,28 +29,15 @@ pub async fn get_pages(guild_id: serenity::GuildId, data: &Data) -> Result<Vec<S
     Ok(pages)
 }
 
-pub async fn paginate(
-    ctx: &serenity::Context,
-    poise_ctx: Option<&Context<'_>>,
-    pages: Vec<String>,
+pub async fn get_embed(
+    pages: &Vec<String>,
     embed_author: Option<serenity::CreateEmbedAuthor>,
-    channel_id: Option<serenity::ChannelId>,
-) -> Result<(), Error> {
-    // Define some unique identifiers for the navigation buttons
-    let ctx_id = match poise_ctx {
-        Some(p) => p.id(),
-        _ => match channel_id {
-            Some(c) => c.get(),
-            _ => 0,
-        },
-    };
+    ctx_id: u64,
+) -> Result<(serenity::CreateEmbed, serenity::CreateActionRow), Error> {
     let prev_button_id = format!("{}prev", ctx_id.clone());
     let next_button_id = format!("{}next", ctx_id.clone());
 
-    let author = match embed_author {
-        Some(a) => a,
-        _ => serenity::CreateEmbedAuthor::new(""),
-    };
+    let author = embed_author.unwrap_or(serenity::CreateEmbedAuthor::new(""));
 
     // Send the embed with the first page as content
     let components = serenity::CreateActionRow::Buttons(vec![
@@ -60,33 +45,24 @@ pub async fn paginate(
         serenity::CreateButton::new(&next_button_id).emoji('▶'),
     ]);
 
-    match channel_id {
-        Some(id) => {
-            let msg = serenity::CreateMessage::new()
-                .embed(
-                    serenity::CreateEmbed::default()
-                        .description(&pages[0])
-                        .title("Leaderboard")
-                        .author(author.clone()),
-                )
-                .components(vec![components]);
-            id.send_message(&ctx.http(), msg).await?;
-        }
-        _ => match poise_ctx {
-            Some(p) => {
-                let reply = poise::CreateReply::default()
-                    .embed(
-                        serenity::CreateEmbed::default()
-                            .description(&pages[0])
-                            .title("Leaderboard")
-                            .author(author.clone()),
-                    )
-                    .components(vec![components]);
-                p.send(reply).await?;
-            }
-            _ => {}
-        },
-    }
+    let embed = serenity::CreateEmbed::default()
+        .description(&pages[0])
+        .title("Leaderboard")
+        .author(author.clone());
+
+    return Ok((embed, components));
+}
+
+pub async fn paginate(
+    ctx: &serenity::Context,
+    pages: &Vec<String>,
+    embed_author: Option<serenity::CreateEmbedAuthor>,
+    ctx_id: u64,
+) -> Result<(), Error> {
+    let prev_button_id = format!("{}prev", ctx_id.clone());
+    let next_button_id = format!("{}next", ctx_id.clone());
+
+    let author = embed_author.unwrap_or(serenity::CreateEmbedAuthor::new(""));
 
     // Loop through incoming interactions with the navigation buttons
     let mut current_page = 0;
@@ -95,7 +71,7 @@ pub async fn paginate(
         // button was pressed
         .filter(move |press| press.data.custom_id.starts_with(&ctx_id.to_string()))
         // Timeout when no navigation button has been pressed for 24 hours
-        .timeout(std::time::Duration::from_secs(3600 * 24))
+        .timeout(tokio::time::Duration::from_secs(3600 * 24))
         .await
     {
         // Depending on which button was pressed, go to next or previous page
@@ -143,12 +119,18 @@ pub async fn leaderboard(ctx: Context<'_>) -> Result<(), Error> {
 
     if let Some(guild_id) = ctx.guild_id() {
         let pages = get_pages(guild_id, &ctx.data()).await?;
+        let (embed, components) = get_embed(&pages, Some(author.clone()), ctx.id()).await?;
+
+        let reply = poise::CreateReply::default()
+            .embed(embed)
+            .components(vec![components]);
+        ctx.send(reply).await?;
+
         paginate(
             &ctx.serenity_context(),
-            Some(&ctx),
-            pages,
-            Some(author),
-            None,
+            &pages,
+            Some(author.clone()),
+            ctx.id(),
         )
         .await?;
     }

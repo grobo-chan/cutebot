@@ -33,7 +33,7 @@ Silly discord bot made by Grobochan for her frens
 - [ ] More mod commands
 
 ## LICENSE
-All the code is under the MIT License. Please see [./LICENSE.txt](./LICENSE.txt) for more info.
+All the code is under the MIT NON-AI License. Please see [./LICENSE.txt](./LICENSE.txt) for more info.
 
 ## CREDITS
 - [GroboChan](https://github.com/grobo-chan): Did all the coding

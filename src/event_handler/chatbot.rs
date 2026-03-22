@@ -1,17 +1,12 @@
-use crate::Error;
+use crate::event_handler::msg_has_keywords;
 use crate::utils::fetch_emote::fetch_emote;
+use crate::{Error, event_handler::CGAHQ_BOT_ID};
 
 use poise::serenity_prelude as serenity;
 use serenity::all::{CreateMessage, Mentionable};
 
-async fn msg_has_keywords(msg: &String, keywords: Vec<&str>) -> Result<bool, Error> {
-    Ok(keywords
-        .iter()
-        .any(|&x| msg.to_lowercase().as_str().contains(x)))
-}
-
 pub async fn chatbot(
-    new_message: &serenity::all::Message,
+    new_message: &serenity::Message,
     ctx: &serenity::Context,
 ) -> Result<(), Error> {
     if msg_has_keywords(
@@ -25,19 +20,33 @@ pub async fn chatbot(
     )
     .await?
     {
-        let cgahq_bot = serenity::UserId::new(1468954832764276856);
+        let cgahq_bot = serenity::UserId::new(CGAHQ_BOT_ID);
         let guild_id = new_message.guild_id.ok_or("Not in a guild")?;
 
         match guild_id.member(&ctx.http, cgahq_bot).await {
             Ok(_) => {
                 let aunn_blush_emoji = fetch_emote(&ctx.http, "aunnblush".to_string()).await?;
 
-                new_message
+                let r = new_message
                     .reply_ping(
                         &ctx.http,
                         format!("I have a crush on {}...", cgahq_bot.mention()),
                     )
-                    .await?;
+                    .await;
+
+                match r {
+                    Ok(_) => {}
+                    _ => {
+                        new_message
+                            .channel_id
+                            .say(
+                                &ctx.http,
+                                format!("I have a crush on {}...", cgahq_bot.mention()),
+                            )
+                            .await?;
+                    }
+                }
+
                 new_message
                     .channel_id
                     .send_message(

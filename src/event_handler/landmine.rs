@@ -4,7 +4,7 @@ use futures::StreamExt;
 use poise::serenity_prelude as serenity;
 use serenity::all::{Mentionable, ReactionType};
 use serenity::builder::{CreateButton, CreateEmbed, CreateMessage};
-use std::time::Duration;
+use tokio::time::Duration;
 
 pub async fn landmine(
     new_message: &serenity::all::Message,

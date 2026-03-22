@@ -1,6 +1,6 @@
 use crate::{
     Data, Error,
-    commands::baguette::leaderboard::{get_pages, paginate},
+    commands::baguette::leaderboard::{get_embed, get_pages, paginate},
 };
 use futures::StreamExt;
 use poise::serenity_prelude as serenity;
@@ -38,8 +38,14 @@ pub async fn update_channel(
         }
 
         let pages = get_pages(guild_id, data).await?;
+        let (embed, components) = get_embed(&pages, None, channel_id).await?;
 
-        paginate(&ctx, None, pages, None, Some(leaderboard_channel)).await?;
+        let msg = serenity::CreateMessage::new()
+            .embed(embed)
+            .components(vec![components]);
+        leaderboard_channel.send_message(&ctx.http(), msg).await?;
+
+        paginate(&ctx, &pages, None, channel_id).await?;
     }
 
     Ok(())

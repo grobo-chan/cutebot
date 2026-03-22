@@ -1,15 +1,25 @@
 mod chatbot;
 mod landmine;
 mod member_join;
+mod troll_cgahq_bot;
 mod update_leaderboard;
 
 use crate::event_handler::chatbot::chatbot;
 use crate::event_handler::landmine::landmine;
 use crate::event_handler::member_join::member_join;
+use crate::event_handler::troll_cgahq_bot::troll_cgahq_bot;
 use crate::event_handler::update_leaderboard::update_channel;
 use crate::{Data, Error};
 use poise::serenity_prelude as serenity;
 use rand::prelude::*;
+
+const CGAHQ_BOT_ID: u64 = 1468954832764276856;
+
+async fn msg_has_keywords(msg: &String, keywords: Vec<&str>) -> Result<bool, Error> {
+    Ok(keywords
+        .iter()
+        .any(|&x| msg.to_lowercase().as_str().contains(x)))
+}
 
 pub async fn event_handler(
     ctx: &serenity::Context,
@@ -25,14 +35,8 @@ pub async fn event_handler(
             println!("Logged in as {}", data_about_bot.user.name);
         }
         serenity::FullEvent::Message { new_message } => {
-            let cgahq_bot_id = 1468954832764276856;
-
-            if new_message.author.id.get() == cgahq_bot_id {
-                if new_message.content
-                    == String::from("obviously im literally the best bot ever made, trust")
-                {
-                    new_message.reply(&ctx.http, "no me").await?;
-                }
+            if new_message.author.id.get() == CGAHQ_BOT_ID {
+                troll_cgahq_bot(&new_message, &ctx).await?;
             }
 
             match ctx.http.get_current_application_info().await {
