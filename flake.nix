@@ -37,6 +37,7 @@
         rust-analyzer
         sqlx-cli
         sqlite
+        openssl
       ];
 
       nativeBuildInputs = [pkgs.pkg-config];
@@ -48,6 +49,7 @@
       src = ./.;
       buildInputs = with pkgs; [
         sqlite
+        openssl
       ];
       nativeBuildInputs = with pkgs; [
         pkg-config
