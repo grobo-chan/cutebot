@@ -48,18 +48,10 @@
       src = ./.;
       buildInputs = with pkgs; [
         sqlite
-        openssl
-        libclang
       ];
       nativeBuildInputs = with pkgs; [
         pkg-config
-        nasm
-        cmake
-        rustPlatform.bindgenHook
       ];
-      AWS_LC_SYS_NO_AR = "1";
-      LIBCLANG_PATH = "${pkgs.libclang.lib}/lib";
-      BINDGEN_EXTRA_CLANG_ARGS = "-I${pkgs.openssl.dev}/include";
     };
   };
 }
