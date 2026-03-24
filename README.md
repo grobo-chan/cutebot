@@ -16,7 +16,7 @@ Silly discord bot made by Grobochan for her frens
   - [x] Give people 100 baguettes on joining 
   - [x] Add a leaderboard
     - [x] Pagination 
-  - [ ] Add baguette trading
+  - [x] Add baguette trading
   - [ ] 1 daily baguette
   - [ ] Baking baguettes
   - [ ] Admin commands
