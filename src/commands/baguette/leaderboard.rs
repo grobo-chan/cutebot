@@ -34,7 +34,7 @@ pub async fn get_pages(guild_id: serenity::GuildId, data: &Data) -> Result<Vec<S
     Ok(pages)
 }
 
-pub async fn get_embed(
+pub async fn get_first_page_embed(
     pages: &Vec<String>,
     embed_author: Option<serenity::CreateEmbedAuthor>,
     ctx_id: u64,
@@ -44,7 +44,6 @@ pub async fn get_embed(
 
     let author = embed_author.unwrap_or(serenity::CreateEmbedAuthor::new(""));
 
-    // Send the embed with the first page as content
     let components = serenity::CreateActionRow::Buttons(vec![
         serenity::CreateButton::new(&prev_button_id).emoji('◀'),
         serenity::CreateButton::new(&next_button_id).emoji('▶'),
@@ -58,7 +57,7 @@ pub async fn get_embed(
     return Ok((embed, components));
 }
 
-pub async fn paginate(
+pub async fn paginate_embed_message(
     ctx: &serenity::Context,
     pages: &Vec<String>,
     embed_author: Option<serenity::CreateEmbedAuthor>,
@@ -124,14 +123,15 @@ pub async fn leaderboard(ctx: Context<'_>) -> Result<(), Error> {
 
     if let Some(guild_id) = ctx.guild_id() {
         let pages = get_pages(guild_id, &ctx.data()).await?;
-        let (embed, components) = get_embed(&pages, Some(author.clone()), ctx.id()).await?;
+        let (embed, components) =
+            get_first_page_embed(&pages, Some(author.clone()), ctx.id()).await?;
 
         let reply = poise::CreateReply::default()
             .embed(embed)
             .components(vec![components]);
         ctx.send(reply).await?;
 
-        paginate(
+        paginate_embed_message(
             &ctx.serenity_context(),
             &pages,
             Some(author.clone()),

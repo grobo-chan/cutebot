@@ -22,7 +22,7 @@ pub async fn reset(ctx: Context<'_>) -> Result<(), Error> {
     let guild_id = ctx.guild_id().ok_or("Not in a guild")?;
 
     let mut settings_query_builder: QueryBuilder<Sqlite> = QueryBuilder::new(format!(
-        "INSERT OR IGNORE INTO servers (server_id, leaderboard_channel, gambling_enabled) VALUES ({}, NULL, 0);",
+        "INSERT OR IGNORE INTO servers VALUES ({}, NULL, NULL, NULL, 0);",
         guild_id.get()
     ));
 

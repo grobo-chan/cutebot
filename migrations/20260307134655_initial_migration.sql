@@ -2,7 +2,16 @@
 CREATE TABLE servers (
     server_id INTEGER PRIMARY KEY,
     leaderboard_channel INTEGER,
+    leaderboard_message INTEGER,
+    landmine_immunity_role INTEGER,
     gambling_enabled INTEGER NOT NULL DEFAULT 0 CHECK(gambling_enabled IN (0,1))
+);
+
+CREATE TABLE landmine_channels (
+    channel_id INTEGER,
+    server_id INTEGER,
+    PRIMARY KEY (server_id, channel_id)
+    FOREIGN KEY (server_id) REFERENCES servers (server_id)
 );
 
 CREATE TABLE balance (
