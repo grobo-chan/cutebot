@@ -5,7 +5,8 @@ Silly discord bot made by Grobochan for her frens
 - [x] Calculator with a dice
 - [x] Landmines (1/6 chance of 10min timeout) in the #gl_talking_here channel
 - [x] A cute little secret ;)
-- [x] The ability to download emojis 
+- [x] The ability to download emojis
+- [ ] Move SQL shit into `./utils` 
 - [ ] Some settings file with all the channel ids 
 - [x] Temperature Commands
   - [x] Conversion
@@ -29,7 +30,7 @@ Silly discord bot made by Grobochan for her frens
 - [ ] Add a Complex Pat Command
 - [ ] Add custom Role Colors (with hex codes)
 - [ ] Add Cards against humanity
-- [ ] 8ball
+- [x] 8ball
 - [ ] More mod commands
 
 ## LICENSE

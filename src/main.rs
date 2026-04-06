@@ -81,6 +81,7 @@ async fn main() {
                 commands::temp::temp(),
                 commands::baguette::baguette(),
                 commands::getemote::getemote(),
+                commands::eight_ball::eight_ball(),
             ],
             prefix_options: poise::PrefixFrameworkOptions {
                 prefix: Some("!".into()),
