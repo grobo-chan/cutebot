@@ -5,15 +5,14 @@ Please see README.md and LICENSE.txt for more information
 
 mod chatbot;
 mod landmine;
-mod member_join;
 mod troll_cgahq_bot;
 mod update_leaderboard;
 
 use crate::event_handler::chatbot::chatbot;
 use crate::event_handler::landmine::landmine;
-use crate::event_handler::member_join::member_join;
 use crate::event_handler::troll_cgahq_bot::troll_cgahq_bot;
 use crate::event_handler::update_leaderboard::update_channel;
+use crate::sql::add_new_member::add_new_member;
 use crate::{Data, Error};
 use poise::serenity_prelude as serenity;
 use rand::prelude::*;
@@ -72,7 +71,7 @@ pub async fn event_handler(
             }
         }
         serenity::FullEvent::GuildMemberAddition { new_member } => {
-            member_join(new_member, data).await?;
+            add_new_member(new_member, data).await?;
         }
         _ => {}
     }

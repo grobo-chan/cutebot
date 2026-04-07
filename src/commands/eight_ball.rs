@@ -7,7 +7,7 @@ use crate::{Context, Error};
 use poise::serenity_prelude as serenity;
 
 use rand::prelude::*;
-use serenity::all::{CreateEmbedAuthor, Mentionable};
+use serenity::all::CreateEmbedAuthor;
 use serenity::builder::CreateEmbed;
 
 /// Literally just 8ball

@@ -17,6 +17,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 mod commands;
 mod event_handler;
+mod sql;
 mod utils;
 
 use poise::serenity_prelude as serenity;

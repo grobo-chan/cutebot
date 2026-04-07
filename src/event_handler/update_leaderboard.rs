@@ -3,33 +3,18 @@ Copyright (C) 2026 GroboChan
 Please see README.md and LICENSE.txt for more information
 */
 
-use crate::{
-    Data, Error,
-    commands::baguette::leaderboard::{
-        self, get_first_page_embed, get_pages, paginate_embed_message,
-    },
-};
+use crate::sql::get_baguettes_data::get_all_baguettes_data;
+use crate::utils::paginate::{get_first_page_embed, get_pages, paginate_embed_message};
+use crate::{Data, Error};
 use futures::StreamExt;
 use poise::serenity_prelude as serenity;
 use serenity::CacheHttp;
-use sqlx::{QueryBuilder, Row, Sqlite};
 
 pub async fn update_channel(
     guild_id: serenity::GuildId,
     ctx: &serenity::Context,
     data: &Data,
 ) -> Result<(), Error> {
-    let mut id_query_builder: QueryBuilder<Sqlite> = QueryBuilder::new(format!(
-        "SELECT leaderboard_channel FROM servers WHERE server_id = {};",
-        guild_id
-    ));
-
-    // let channel_id: u64 = id_query_builder
-    //     .build()
-    //     .fetch_one(&data.database)
-    //     .await?
-    //     .try_get("leaderboard_channel")?;
-
     let channel_id = 1480154675608027226;
     let message_id = 1486020752393240750;
 
@@ -50,7 +35,8 @@ pub async fn update_channel(
             }
         }
 
-        let pages = get_pages(guild_id, data).await?;
+        let info = get_all_baguettes_data(guild_id, data).await?;
+        let pages = get_pages(info).await?;
         let (embed, components) = get_first_page_embed(&pages, None, channel_id).await?;
 
         let msg_edit = serenity::EditMessage::new()
