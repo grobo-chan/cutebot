@@ -22,10 +22,9 @@ pub async fn reset_server(ctx: &Context<'_>) -> Result<(), Error> {
     settings_query.execute(&ctx.data().database).await?;
 
     let mut delete_query_builder: QueryBuilder<Sqlite> = QueryBuilder::new(format!(
-        "DELETE FROM transactions WHERE server_id = {id}; DELETE FROM balance WHERE server_id = {id};",
+        "DELETE FROM balance WHERE server_id = {id};",
         id = guild_id.get()
     ));
-
     let delete_query = delete_query_builder.build();
     println!("{}", delete_query.sql());
     delete_query.execute(&ctx.data().database).await?;

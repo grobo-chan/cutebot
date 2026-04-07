@@ -1,4 +1,6 @@
 -- Add migration script here
+PRAGMA foreign_keys=ON;
+
 CREATE TABLE servers (
     server_id INTEGER PRIMARY KEY,
     leaderboard_channel INTEGER,
@@ -29,7 +31,20 @@ CREATE TABLE transactions (
     receiver_id INTEGER NOT NULL,
     amount INTEGER NOT NULL,
     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (sender_id, server_id) REFERENCES balance (user_id, server_id),
-    FOREIGN KEY (receiver_id, server_id) REFERENCES balance (user_id, server_id),
+    FOREIGN KEY (sender_id, server_id) REFERENCES balance (user_id, server_id) ON DELETE CASCADE,
+    FOREIGN KEY (receiver_id, server_id) REFERENCES balance (user_id, server_id) ON DELETE CASCADE,
+    FOREIGN KEY (server_id) REFERENCES servers (server_id)
+);
+
+CREATE TABLE baguette_audit_log (
+    action_id INTEGER PRIMARY KEY,
+    server_id INTEGER NOT NULL,
+    admin_id INTEGER NOT NULL,
+    user_id INTEGER NOT NULL,
+    action STRING NOT NULL CHECK(action IN ("add_baguettes", "remove_baguettes", "set_baguettes")),
+    amount INTEGER NOT NULL,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id, server_id) REFERENCES balance (user_id, server_id) ON DELETE CASCADE,
+    FOREIGN KEY (admin_id, server_id) REFERENCES balance (user_id, server_id) ON DELETE CASCADE,
     FOREIGN KEY (server_id) REFERENCES servers (server_id)
 );

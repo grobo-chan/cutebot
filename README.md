@@ -19,10 +19,10 @@ Silly discord bot made by Grobochan for her frens
   - [x] Add baguette trading
   - [ ] 1 daily baguette
   - [ ] Baking baguettes
-  - [ ] Admin commands
-    - [ ] Give baguettes
-    - [ ] Remove baguettes
-    - [ ] Set baguettes
+  - [x] Admin commands
+    - [x] Give baguettes
+    - [x] Remove baguettes
+    - [x] Set baguettes
   - [ ] `.json` backups of the economy
   - [ ] Gambling the baguettes
   - [ ] Eating the baguettes
