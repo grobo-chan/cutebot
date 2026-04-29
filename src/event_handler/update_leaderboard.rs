@@ -15,7 +15,7 @@ pub async fn update_channel(
     ctx: &serenity::Context,
     data: &Data,
 ) -> Result<(), Error> {
-    let channel_id = 1480154675608027226;
+    let channel_id = 0;
     let message_id = 1486020752393240750;
 
     if channel_id != 0 {

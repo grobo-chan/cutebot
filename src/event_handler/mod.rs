@@ -13,6 +13,7 @@ use crate::event_handler::landmine::landmine;
 use crate::event_handler::troll_cgahq_bot::troll_cgahq_bot;
 use crate::event_handler::update_leaderboard::update_channel;
 use crate::sql::add_new_member::add_new_member;
+use crate::sql::reset_server::reset_server;
 use crate::{Data, Error};
 use poise::serenity_prelude as serenity;
 use rand::prelude::*;
@@ -72,6 +73,9 @@ pub async fn event_handler(
         }
         serenity::FullEvent::GuildMemberAddition { new_member } => {
             add_new_member(new_member, data).await?;
+        }
+        serenity::FullEvent::GuildCreate { guild, .. } => {
+            reset_server(&guild.id, data, &ctx.http).await?;
         }
         _ => {}
     }

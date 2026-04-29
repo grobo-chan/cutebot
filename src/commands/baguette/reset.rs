@@ -16,7 +16,12 @@ use serenity::builder::{CreateEmbed, CreateEmbedAuthor};
     aliases("init")
 )]
 pub async fn reset(ctx: Context<'_>) -> Result<(), Error> {
-    reset_server(&ctx).await?;
+    reset_server(
+        ctx.guild_id().get_or_insert(serenity::GuildId::new(1)),
+        &ctx.data(),
+        ctx.http(),
+    )
+    .await?;
 
     let embed_author =
         CreateEmbedAuthor::new(&format!("Requested by: {}", ctx.author().display_name())).icon_url(

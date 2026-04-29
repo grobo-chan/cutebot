@@ -1,9 +1,14 @@
+/*
+Copyright (C) 2026 GroboChan
+Please see README.md and LICENSE.txt for more information
+*/
+
 use crate::{
     Context, Error,
     sql::modify_baguettes_data::{add_baguettes, log_action, remove_baguettes, set_baguettes},
 };
-use ::serenity::all::Mentionable;
 use poise::serenity_prelude as serenity;
+use serenity::all::Mentionable;
 
 /// The Parent Baguette Command
 #[poise::command(
@@ -59,7 +64,7 @@ pub async fn add_baguette(
     Ok(())
 }
 
-/// Add Baguettes
+/// Remove Baguettes
 #[poise::command(slash_command, prefix_command)]
 pub async fn remove_baguette(
     ctx: Context<'_>,
@@ -101,7 +106,7 @@ pub async fn remove_baguette(
     Ok(())
 }
 
-/// Add Baguettes
+/// Set Baguettes
 #[poise::command(slash_command, prefix_command)]
 pub async fn set_baguette(
     ctx: Context<'_>,
@@ -110,12 +115,7 @@ pub async fn set_baguette(
 ) -> Result<(), Error> {
     let admin_id = ctx.author().id;
     let user_id = user.id;
-    let server_id = {
-        match ctx.guild_id() {
-            Some(id) => id,
-            _ => panic!("Not in a server!"),
-        }
-    };
+    let server_id = ctx.guild_id().expect("Not in a guild!");
     let action = String::from("set_baguettes");
 
     log_action(amount, user_id, admin_id, server_id, action, &ctx.data()).await?;

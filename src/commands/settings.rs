@@ -1,0 +1,120 @@
+/*
+Copyright (C) 2026 GroboChan
+Please see README.md and LICENSE.txt for more information
+*/
+
+use crate::sql::edit_settings::edit_setting;
+use crate::{Context, Error};
+
+use futures::{Stream, StreamExt};
+use poise::serenity_prelude as serenity;
+use serenity::all::Mentionable;
+use serenity::utils::{parse_channel_mention, parse_role_mention};
+
+/// The Parent Settings Command
+#[poise::command(
+    slash_command,
+    prefix_command,
+    required_permissions = "MANAGE_GUILD",
+    subcommands("edit"),
+    subcommand_required
+)]
+pub async fn settings(_: Context<'_>) -> Result<(), Error> {
+    Ok(())
+}
+
+async fn autocomplete<'a>(_ctx: Context<'_>, partial: &'a str) -> impl Stream<Item = String> {
+    futures::stream::iter(&[
+        "leaderboard_channel",
+        "landmine_channel",
+        "landmine_immunity_role",
+        "gambling_enabled",
+    ])
+    .filter(move |name| futures::future::ready(name.starts_with(partial)))
+    .map(|name| name.to_string())
+}
+
+/// Edits a setting
+#[poise::command(slash_command, prefix_command)]
+pub async fn edit(
+    ctx: Context<'_>,
+    #[autocomplete = "autocomplete"] option: String,
+    new_setting: String,
+) -> Result<(), Error> {
+    let embed_author =
+        serenity::CreateEmbedAuthor::new(&format!("Requested by: {}", ctx.author().display_name()))
+            .icon_url(
+                ctx.author()
+                    .avatar_url()
+                    .unwrap_or_else(|| ctx.author().default_avatar_url()),
+            );
+    let server_id = ctx.guild_id().expect("Not in a server!");
+
+    let embed = match option.to_lowercase().as_str() {
+        "leaderboard_channel" | "landmine_channel" => {
+            let channel_id = parse_channel_mention(new_setting.as_str());
+            match channel_id {
+                Some(c) => {
+                    edit_setting(server_id, &option, c.get(), &ctx.data()).await?;
+
+                    serenity::CreateEmbed::new()
+                        .author(embed_author)
+                        .colour(serenity::Colour::DARK_GREEN)
+                        .description(format!("{} is now set to {}", option, c.mention()))
+                }
+                None => serenity::CreateEmbed::new()
+                    .author(embed_author)
+                    .colour(serenity::Colour::RED)
+                    .description("Invalid channel id was provided!"),
+            }
+        }
+        "landmine_immunity_role" => {
+            let role_id = parse_role_mention(new_setting.as_str());
+            match role_id {
+                Some(r) => {
+                    edit_setting(server_id, &option, r.get(), &ctx.data()).await?;
+
+                    serenity::CreateEmbed::new()
+                        .author(embed_author)
+                        .colour(serenity::Colour::DARK_GREEN)
+                        .description(format!("{} is now set to {}", option, r.mention()))
+                }
+                None => serenity::CreateEmbed::new()
+                    .author(embed_author)
+                    .colour(serenity::Colour::RED)
+                    .description("Invalid role id was provided!"),
+            }
+        }
+        "gambling_enabled" => match new_setting.to_lowercase().as_str() {
+            "yes" | "y" | "true" => {
+                edit_setting(server_id, &option, true, &ctx.data()).await?;
+
+                serenity::CreateEmbed::new()
+                    .author(embed_author)
+                    .colour(serenity::Colour::DARK_GREEN)
+                    .description(format!("{} is now set to true", option))
+            }
+            "no" | "n" | "false" => {
+                edit_setting(server_id, &option, false, &ctx.data()).await?;
+
+                serenity::CreateEmbed::new()
+                    .author(embed_author)
+                    .colour(serenity::Colour::DARK_GREEN)
+                    .description(format!("{} is now set to false", option))
+            }
+            _ => serenity::CreateEmbed::new()
+                .author(embed_author)
+                .colour(serenity::Colour::RED)
+                .description("Please pick either 'yes' or 'no'."),
+        },
+        _ => serenity::CreateEmbed::new()
+            .author(embed_author)
+            .colour(serenity::Colour::RED)
+            .description("Invalid option was provided!"),
+    };
+
+    let reply = poise::CreateReply::default().embed(embed);
+    ctx.send(reply).await?;
+
+    Ok(())
+}

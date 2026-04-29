@@ -10,4 +10,5 @@ pub mod calc;
 pub mod eight_ball;
 pub mod getemote;
 pub mod ping;
+pub mod settings;
 pub mod temp;
