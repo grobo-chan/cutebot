@@ -29,6 +29,7 @@ async fn autocomplete<'a>(_ctx: Context<'_>, partial: &'a str) -> impl Stream<It
         "landmine_channel",
         "landmine_immunity_role",
         "gambling_enabled",
+        "daily_baguettes",
     ])
     .filter(move |name| futures::future::ready(name.starts_with(partial)))
     .map(|name| name.to_string())
@@ -57,10 +58,16 @@ pub async fn edit(
                 Some(c) => {
                     edit_setting(server_id, &option, c.get(), &ctx.data()).await?;
 
+                    let option_name = match option.to_lowercase().as_str() {
+                        "leaderboard_channel" => "Leaderboard Channel",
+                        "landmine_channel" => "Landmine Channel",
+                        _ => "",
+                    };
+
                     serenity::CreateEmbed::new()
                         .author(embed_author)
                         .colour(serenity::Colour::DARK_GREEN)
-                        .description(format!("{} is now set to {}", option, c.mention()))
+                        .description(format!("{} is now set to {}", option_name, c.mention()))
                 }
                 None => serenity::CreateEmbed::new()
                     .author(embed_author)
@@ -77,7 +84,10 @@ pub async fn edit(
                     serenity::CreateEmbed::new()
                         .author(embed_author)
                         .colour(serenity::Colour::DARK_GREEN)
-                        .description(format!("{} is now set to {}", option, r.mention()))
+                        .description(format!(
+                            "Landmine immunity role is now set to {}",
+                            r.mention()
+                        ))
                 }
                 None => serenity::CreateEmbed::new()
                     .author(embed_author)
@@ -92,7 +102,7 @@ pub async fn edit(
                 serenity::CreateEmbed::new()
                     .author(embed_author)
                     .colour(serenity::Colour::DARK_GREEN)
-                    .description(format!("{} is now set to true", option))
+                    .description("Gambling is now enabled!")
             }
             "no" | "n" | "false" => {
                 edit_setting(server_id, &option, false, &ctx.data()).await?;
@@ -100,12 +110,29 @@ pub async fn edit(
                 serenity::CreateEmbed::new()
                     .author(embed_author)
                     .colour(serenity::Colour::DARK_GREEN)
-                    .description(format!("{} is now set to false", option))
+                    .description("Gambling is now disabled!")
             }
             _ => serenity::CreateEmbed::new()
                 .author(embed_author)
                 .colour(serenity::Colour::RED)
                 .description("Please pick either 'yes' or 'no'."),
+        },
+        "daily_baguettes" => match new_setting.parse::<i32>().ok() {
+            Some(amount) => {
+                edit_setting(server_id, &option, amount, &ctx.data()).await?;
+
+                serenity::CreateEmbed::new()
+                    .author(embed_author)
+                    .colour(serenity::Colour::DARK_GREEN)
+                    .description(format!(
+                        "The number of daily baguettes is now set to {}",
+                        amount
+                    ))
+            }
+            None => serenity::CreateEmbed::new()
+                .author(embed_author)
+                .colour(serenity::Colour::RED)
+                .description("Please select an integer."),
         },
         _ => serenity::CreateEmbed::new()
             .author(embed_author)

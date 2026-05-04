@@ -7,7 +7,8 @@ CREATE TABLE servers (
     leaderboard_message INTEGER,
     landmine_channel INTEGER,
     landmine_immunity_role INTEGER,
-    gambling_enabled INTEGER NOT NULL DEFAULT 0 CHECK(gambling_enabled IN (0,1))
+    gambling_enabled INTEGER NOT NULL DEFAULT 0 CHECK(gambling_enabled IN (0,1)),
+    daily_baguettes INTEGER NOT NULL DEFAULT 1
 );
 
 CREATE TABLE balance (

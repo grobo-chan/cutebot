@@ -15,6 +15,7 @@ use crate::event_handler::update_leaderboard::update_channel;
 use crate::sql::add_new_member::add_new_member;
 use crate::sql::reset_server::reset_server;
 use crate::{Data, Error};
+
 use poise::serenity_prelude as serenity;
 use rand::prelude::*;
 

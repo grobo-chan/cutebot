@@ -7,6 +7,16 @@ use crate::{Data, Error};
 use poise::serenity_prelude as serenity;
 use sqlx::{Execute, QueryBuilder, Sqlite};
 
+pub async fn add_daily_baguettes(data: &Data) -> Result<(), Error> {
+    let mut query: QueryBuilder<Sqlite> = QueryBuilder::new(
+        "UPDATE balance SET baguettes = balance.baguettes + servers.daily_baguettes FROM servers WHERE servers.server_id = balance.server_id;",
+    );
+
+    query.build().execute(&data.database).await?;
+
+    Ok(())
+}
+
 pub async fn add_baguettes(
     amount: u16,
     user_id: serenity::UserId,

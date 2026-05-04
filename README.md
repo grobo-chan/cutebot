@@ -6,7 +6,9 @@ Silly discord bot made by Grobochan for her frens
 - [x] Landmines (1/6 chance of 10min timeout) in the #gl_talking_here channel
 - [x] A cute little secret ;)
 - [x] The ability to download emojis 
-- [ ] Some settings file with all the channel ids 
+- [ ] Bot Settings
+  - [x] Setting the settings
+  - [ ] Making the settings work
 - [x] Temperature Commands
   - [x] Conversion
   - [x] Get temperature of a location
@@ -17,7 +19,7 @@ Silly discord bot made by Grobochan for her frens
   - [x] Add a leaderboard
     - [x] Pagination 
   - [x] Add baguette trading
-  - [ ] 1 daily baguette
+  - [x] Certain number of daily baguettes (Depending on server settings)
   - [ ] Baking baguettes
   - [x] Admin commands
     - [x] Give baguettes

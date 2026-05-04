@@ -23,10 +23,12 @@ mod utils;
 use poise::serenity_prelude as serenity;
 use sqlx::{Pool, Sqlite};
 use std::env;
+use std::sync::Arc;
+use std::time::Duration;
 
 use crate::event_handler::event_handler;
+use crate::sql::modify_baguettes_data::add_daily_baguettes;
 
-// User data, which is stored and accessible in all command invocations
 pub struct Data {
     database: Pool<Sqlite>,
 }
@@ -38,12 +40,28 @@ async fn on_error(error: poise::FrameworkError<'_, Data, Error>) {
     match error {
         poise::FrameworkError::Setup { error, .. } => panic!("Failed to start bot: {:?}", error),
         poise::FrameworkError::Command { error, ctx, .. } => {
-            println!("Error in command `{}`: {:?}", ctx.command().name, error,);
+            eprintln!("Error in command `{}`: {:?}", ctx.command().name, error,);
         }
         error => {
             if let Err(e) = poise::builtins::on_error(error).await {
-                println!("Error while handling error: {}", e)
+                eprintln!("Error while handling error: {}", e)
             }
+        }
+    }
+}
+
+async fn background_task(data: Arc<Data>) {
+    let mut interval = tokio::time::interval(Duration::from_secs(24 * 60 * 60));
+    // let mut interval = tokio::time::interval(Duration::from_secs(10));
+
+    loop {
+        interval.tick().await;
+        if let Err(e) = add_daily_baguettes(&Data {
+            database: data.database.clone(),
+        })
+        .await
+        {
+            eprintln!("Error in background task: {:?}", e);
         }
     }
 }
@@ -98,6 +116,15 @@ async fn main() {
         .setup(|ctx, _ready, framework| {
             Box::pin(async move {
                 poise::builtins::register_globally(ctx, &framework.options().commands).await?;
+
+                let arc_data = Arc::new(Data {
+                    database: database.clone(),
+                });
+
+                tokio::spawn(async move {
+                    background_task(arc_data).await;
+                });
+
                 Ok(Data { database: database })
             })
         })
