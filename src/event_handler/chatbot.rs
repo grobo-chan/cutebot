@@ -14,6 +14,9 @@ pub async fn chatbot(
     new_message: &serenity::Message,
     ctx: &serenity::Context,
 ) -> Result<(), Error> {
+    let cgahq_bot = serenity::UserId::new(CGAHQ_BOT_ID);
+    println!("{}", &new_message.content);
+
     if msg_has_keywords(
         &new_message.content,
         vec![
@@ -25,7 +28,6 @@ pub async fn chatbot(
     )
     .await?
     {
-        let cgahq_bot = serenity::UserId::new(CGAHQ_BOT_ID);
         let guild_id = new_message.guild_id.ok_or("Not in a guild")?;
 
         match guild_id.member(&ctx.http, cgahq_bot).await {
@@ -93,7 +95,7 @@ pub async fn chatbot(
             .await?;
     } else if msg_has_keywords(
         &new_message.content,
-        vec!["you are cute", "u r cute", "you cute", "u cute"],
+        vec!["you are cute", "u r cute", "you cute", "u cute", "cute"],
     )
     .await?
     {
@@ -103,10 +105,36 @@ pub async fn chatbot(
             .await?;
         new_message
             .channel_id
-            .send_message(
+            .say(&ctx.http, format!("{} 💥", sapphire_ababa_emote))
+            .await?;
+        new_message
+            .channel_id
+            .say(
                 &ctx.http,
-                CreateMessage::new().content(format!("{} 💥", sapphire_ababa_emote)),
+                format!("{} is cuter than me qwq", cgahq_bot.mention()),
             )
+            .await?;
+    } else if msg_has_keywords(
+        &new_message.content,
+        vec!["you are gay", "u r gay", "you gay", "u gay", "gay"],
+    )
+    .await?
+    {
+        let sapphire_ababa_emote = fetch_emote(&ctx.http, "sapphireababa".to_string()).await?;
+        new_message
+            .reply(
+                &ctx.http,
+                "YESIMGAYYOUALSOGAYIMSCARYGHOSTIMBOTIMNOTCATIEXPLODE",
+            )
+            .await?;
+        new_message
+            .channel_id
+            .say(&ctx.http, format!("{} 💥", sapphire_ababa_emote))
+            .await?;
+    } else if msg_has_keywords(&new_message.content, vec!["psychopath", "sociopath"]).await? {
+        let letsu_emote = fetch_emote(&ctx.http, "letsu".to_string()).await?;
+        new_message
+            .reply(&ctx.http, format!("ok and? {}", letsu_emote))
             .await?;
     }
 

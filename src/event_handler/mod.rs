@@ -22,9 +22,11 @@ use rand::prelude::*;
 const CGAHQ_BOT_ID: u64 = 1468954832764276856;
 
 async fn msg_has_keywords(msg: &String, keywords: Vec<&str>) -> Result<bool, Error> {
-    Ok(keywords
-        .iter()
-        .any(|&x| msg.to_lowercase().as_str().contains(x)))
+    Ok(keywords.iter().any(|&x| {
+        msg.to_lowercase()
+            .as_str()
+            .contains(x.to_lowercase().as_str())
+    }))
 }
 
 pub async fn event_handler(

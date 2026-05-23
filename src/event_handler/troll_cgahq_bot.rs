@@ -5,6 +5,7 @@ Please see README.md and LICENSE.txt for more information
 
 use crate::Error;
 use crate::event_handler::msg_has_keywords;
+use crate::utils::fetch_emote::fetch_emote;
 
 use poise::serenity_prelude as serenity;
 use tokio::time::{Duration, sleep};
@@ -13,6 +14,8 @@ pub async fn troll_cgahq_bot(
     new_message: &serenity::all::Message,
     ctx: &serenity::Context,
 ) -> Result<(), Error> {
+    println!("{}", &new_message.content);
+
     if msg_has_keywords(
         &new_message.content,
         vec!["obviously im literally the best bot ever made, trust"],
@@ -33,6 +36,14 @@ pub async fn troll_cgahq_bot(
         sleep(Duration::from_secs(4)).await;
         new_message
             .reply(&ctx.http, "mine is linked in my bio uwu")
+            .await?;
+    } else if msg_has_keywords(&new_message.content, vec!["INCREDIBLY OFFENDED"]).await? {
+        let letsu_emote = fetch_emote(&ctx.http, "letsu".to_string()).await?;
+        new_message
+            .reply(
+                &ctx.http,
+                format!("fuck you i removed luna role again {}", letsu_emote),
+            )
             .await?;
     }
 
