@@ -17,7 +17,6 @@ Silly discord bot made by Grobochan for her frens
   - [x] Initiliaze/Reset the economy
   - [x] Give people 100 baguettes on joining 
   - [x] Add a leaderboard
-    - [x] Pagination 
   - [x] Add baguette trading
   - [x] Certain number of daily baguettes (Depending on server settings)
   - [ ] Baking baguettes

@@ -5,7 +5,7 @@ Please see README.md and LICENSE.txt for more information
 
 use poise::serenity_prelude as serenity;
 use sqlx::query_builder::QueryBuilder;
-use sqlx::{Execute, Sqlite};
+use sqlx::{Column, Execute, Row, Sqlite};
 
 use crate::{Data, Error};
 
@@ -27,4 +27,26 @@ pub async fn edit_setting<T: std::fmt::Display, U: std::fmt::Display>(
     edit_query.execute(&data.database).await?;
 
     Ok(())
+}
+
+pub async fn get_setting(
+    guild_id: serenity::GuildId,
+    setting: &str,
+    data: &Data,
+) -> Result<String, Error> {
+    let query_str = format!(
+        "SELECT CAST({0} AS TEXT) AS {0} FROM servers WHERE server_id = $1;",
+        setting
+    );
+    let row = sqlx::query(&query_str)
+        .bind(&guild_id.get().to_string())
+        .fetch_one(&data.database)
+        .await?;
+
+    for c in row.columns() {
+        println!("{}", c.name());
+    }
+
+    let result = row.try_get::<String, &str>(setting).unwrap_or_default();
+    Ok(result)
 }

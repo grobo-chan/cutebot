@@ -77,8 +77,10 @@ pub async fn event_handler(
         serenity::FullEvent::GuildMemberAddition { new_member } => {
             add_new_member(new_member, data).await?;
         }
-        serenity::FullEvent::GuildCreate { guild, .. } => {
-            reset_server(&guild.id, data, &ctx.http).await?;
+        serenity::FullEvent::GuildCreate { guild, is_new } => {
+            if is_new.unwrap_or(false) {
+                reset_server(&guild.id, data, &ctx.http).await?;
+            }
         }
         _ => {}
     }

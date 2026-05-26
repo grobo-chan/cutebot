@@ -15,7 +15,6 @@ pub async fn chatbot(
     ctx: &serenity::Context,
 ) -> Result<(), Error> {
     let cgahq_bot = serenity::UserId::new(CGAHQ_BOT_ID);
-    println!("{}", &new_message.content);
 
     if msg_has_keywords(
         &new_message.content,
@@ -133,8 +132,24 @@ pub async fn chatbot(
             .await?;
     } else if msg_has_keywords(&new_message.content, vec!["psychopath", "sociopath"]).await? {
         let letsu_emote = fetch_emote(&ctx.http, "letsu".to_string()).await?;
+        new_message.reply(&ctx.http, "ok and?").await?;
         new_message
-            .reply(&ctx.http, format!("ok and? {}", letsu_emote))
+            .channel_id
+            .say(&ctx.http, "that's based")
+            .await?;
+        new_message.channel_id.say(&ctx.http, letsu_emote).await?;
+    } else if msg_has_keywords(&new_message.content, vec!["rate"]).await? {
+        let flansmug_emote = fetch_emote(&ctx.http, "flansmug".to_string()).await?;
+        new_message
+            .channel_id
+            .say(
+                &ctx.http,
+                "[poise](<https://github.com/serenity-rs/poise>) do be bulky, but other than that i guess im a good bot",
+            )
+            .await?;
+        new_message
+            .channel_id
+            .say(&ctx.http, flansmug_emote)
             .await?;
     }
 

@@ -4,9 +4,7 @@ Please see README.md and LICENSE.txt for more information
 */
 use crate::{
     Context, Error,
-    sql::{
-        get_baguettes_data::get_user_baguettes_data, modify_baguettes_data::perform_transaction,
-    },
+    sql::{edit_baguettes_data::perform_transaction, get_baguettes_data::get_user_baguettes_data},
 };
 use poise::serenity_prelude as serenity;
 use serenity::all::Mentionable;

@@ -5,7 +5,7 @@ Please see README.md and LICENSE.txt for more information
 
 use crate::{
     Context, Error,
-    sql::modify_baguettes_data::{add_baguettes, log_action, remove_baguettes, set_baguettes},
+    sql::edit_baguettes_data::{add_baguettes, log_action, remove_baguettes, set_baguettes},
 };
 use poise::serenity_prelude as serenity;
 use serenity::all::Mentionable;

@@ -27,7 +27,7 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use crate::event_handler::event_handler;
-use crate::sql::modify_baguettes_data::add_daily_baguettes;
+use crate::sql::edit_baguettes_data::add_daily_baguettes;
 
 pub struct Data {
     database: Pool<Sqlite>,
