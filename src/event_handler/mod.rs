@@ -14,6 +14,7 @@ use crate::event_handler::troll_cgahq_bot::troll_cgahq_bot;
 use crate::event_handler::update_leaderboard::update_channel;
 use crate::sql::add_new_member::add_new_member;
 use crate::sql::reset_server::reset_server;
+use crate::sql::settings::get_setting;
 use crate::{Data, Error};
 
 use poise::serenity_prelude as serenity;
@@ -62,16 +63,31 @@ pub async fn event_handler(
                 return Ok(());
             }
 
-            let is_landmine_channel = vec![1450186078249291866, 942627172705779863]
-                .iter()
-                .any(|&x| new_message.channel_id == serenity::ChannelId::new(x));
+            if let Some(guild_id) = new_message.guild_id {
+                let server_landmine: u64 = get_setting(guild_id, "landmine_channel", data)
+                    .await?
+                    .parse()
+                    .unwrap_or_default();
 
-            if is_landmine_channel && num == 1 {
-                landmine(new_message, ctx).await?;
-            }
+                let landmine_immune_role: u64 =
+                    get_setting(guild_id, "landmine_immunity_role", data)
+                        .await?
+                        .parse()
+                        .unwrap_or_default();
 
-            if new_message.mentions_me(&ctx.http).await? {
-                chatbot(new_message, ctx).await?;
+                if (new_message.channel_id.get() == server_landmine)
+                    && (num == 1)
+                    && !(new_message
+                        .author
+                        .has_role(&ctx.http, guild_id, landmine_immune_role)
+                        .await?)
+                {
+                    landmine(new_message, ctx).await?;
+                }
+
+                if new_message.mentions_me(&ctx.http).await? {
+                    chatbot(new_message, ctx).await?;
+                }
             }
         }
         serenity::FullEvent::GuildMemberAddition { new_member } => {

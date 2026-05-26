@@ -5,7 +5,7 @@ Please see README.md and LICENSE.txt for more information
 
 use poise::serenity_prelude as serenity;
 use sqlx::query_builder::QueryBuilder;
-use sqlx::{Column, Execute, Row, Sqlite};
+use sqlx::{Row, Sqlite};
 
 use crate::{Data, Error};
 
@@ -23,7 +23,6 @@ pub async fn edit_setting<T: std::fmt::Display, U: std::fmt::Display>(
     ));
 
     let edit_query = edit_query_builder.build();
-    println!("{}", edit_query.sql());
     edit_query.execute(&data.database).await?;
 
     Ok(())
@@ -42,10 +41,6 @@ pub async fn get_setting(
         .bind(&guild_id.get().to_string())
         .fetch_one(&data.database)
         .await?;
-
-    for c in row.columns() {
-        println!("{}", c.name());
-    }
 
     let result = row.try_get::<String, &str>(setting).unwrap_or_default();
     Ok(result)
