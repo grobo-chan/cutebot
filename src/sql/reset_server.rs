@@ -5,8 +5,8 @@ Please see README.md and LICENSE.txt for more information
 
 use futures::StreamExt;
 use poise::serenity_prelude as serenity;
+use sqlx::Sqlite;
 use sqlx::query_builder::QueryBuilder;
-use sqlx::{Execute, Sqlite};
 
 use crate::{Data, Error};
 
@@ -21,7 +21,6 @@ pub async fn reset_server(
     ));
 
     let settings_query = settings_query_builder.build();
-    println!("{}", settings_query.sql());
     settings_query.execute(&data.database).await?;
 
     let mut delete_query_builder: QueryBuilder<Sqlite> = QueryBuilder::new(format!(
@@ -29,7 +28,6 @@ pub async fn reset_server(
         id = guild_id.get()
     ));
     let delete_query = delete_query_builder.build();
-    println!("{}", delete_query.sql());
     delete_query.execute(&data.database).await?;
 
     let mut query_builder: QueryBuilder<Sqlite> = QueryBuilder::new("");
@@ -51,7 +49,6 @@ pub async fn reset_server(
     }
 
     let query = query_builder.build();
-    println!("{}", query.sql());
     query.execute(&data.database).await?;
 
     Ok(())

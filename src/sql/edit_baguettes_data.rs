@@ -5,7 +5,7 @@ Please see README.md and LICENSE.txt for more information
 
 use crate::{Data, Error};
 use poise::serenity_prelude as serenity;
-use sqlx::{Execute, QueryBuilder, Sqlite};
+use sqlx::{QueryBuilder, Sqlite};
 
 pub async fn add_daily_baguettes(data: &Data) -> Result<(), Error> {
     let mut query: QueryBuilder<Sqlite> = QueryBuilder::new(
@@ -108,8 +108,6 @@ pub async fn log_action(
         action = action
     ));
 
-    let sql = query.build();
-    println!("{}", sql.sql());
-    sql.execute(&data.database).await?;
+    query.build().execute(&data.database).await?;
     Ok(())
 }

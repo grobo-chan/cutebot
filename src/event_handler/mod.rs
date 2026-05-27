@@ -85,9 +85,7 @@ pub async fn event_handler(
                     landmine(new_message, ctx).await?;
                 }
 
-                if (new_message.mentions_me(&ctx.http).await?)
-                    || (msg_has_keywords(&new_message.content, vec!["cutebot", "cute bot"]).await?)
-                {
+                if new_message.mentions_me(&ctx.http).await? {
                     chatbot(new_message, ctx).await?;
                 }
             }

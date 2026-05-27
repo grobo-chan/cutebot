@@ -33,14 +33,13 @@ pub async fn get_setting(
     setting: &str,
     data: &Data,
 ) -> Result<String, Error> {
-    let query_str = format!(
-        "SELECT CAST({0} AS TEXT) AS {0} FROM servers WHERE server_id = $1;",
-        setting
-    );
-    let row = sqlx::query(&query_str)
-        .bind(&guild_id.get().to_string())
-        .fetch_one(&data.database)
-        .await?;
+    let mut get_query_builder: QueryBuilder<Sqlite> = QueryBuilder::new(format!(
+        "SELECT CAST({0} AS TEXT) AS {0} FROM servers WHERE server_id = {1};",
+        setting,
+        guild_id.get()
+    ));
+
+    let row = get_query_builder.build().fetch_one(&data.database).await?;
 
     let result = row.try_get::<String, &str>(setting).unwrap_or_default();
     Ok(result)

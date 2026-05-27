@@ -4,26 +4,18 @@ Silly discord bot made by Grobochan for her frens
 - [x] Ben Command
 - [x] Calculator with a dice
 - [x] Landmines (1/6 chance of 10min timeout) in the #gl_talking_here channel
-- [x] A cute little secret ;)
+- [x] Eastereggs
 - [x] The ability to download emojis 
-- [ ] Bot Settings
-  - [x] Setting the settings
-  - [ ] Making the settings work
+- [x] Bot Settings
 - [x] Temperature Commands
-  - [x] Conversion
-  - [x] Get temperature of a location
-  - [x] Have the temperature actually be real (See [#1](https://github.com/grobo-chan/cutebot/issues/1))
 - [ ] Gluten-Free Baguette Commands
   - [x] Initiliaze/Reset the economy
   - [x] Give people 100 baguettes on joining 
   - [x] Add a leaderboard
   - [x] Add baguette trading
   - [x] Certain number of daily baguettes (Depending on server settings)
-  - [ ] Baking baguettes
   - [x] Admin commands
-    - [x] Give baguettes
-    - [x] Remove baguettes
-    - [x] Set baguettes
+  - [ ] Baking baguettes
   - [ ] `.json` backups of the economy
   - [ ] Gambling the baguettes
   - [ ] Eating the baguettes

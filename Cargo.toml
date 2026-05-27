@@ -1,6 +1,6 @@
 [package]
 name = "cutebot"
-version = "0.2.0"
+version = "0.1.2"
 edition = "2024"
 authors = ["Grobochan"]
 description = "A silly discord bot made by Grobochan for her server"
@@ -16,5 +16,5 @@ rand = "0.10.0"
 reqwest = { version = "0.13.2", default-features = false, features = ["json", "query", "native-tls"] }
 serde = { version = "1.0.228", features = ["derive"] }
 serenity = { version = "0.12.5", default-features = false, features = ["default_native_tls"] }
-sqlx = { version = "0.8.6", features = ["runtime-tokio-native-tls", "sqlite"] }
+sqlx = { version = "0.9.0", features = ["runtime-tokio", "tls-native-tls", "sqlite"] }
 tokio = { version = "1.49.0", features = ["full"] }
