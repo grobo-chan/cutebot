@@ -4,6 +4,7 @@ Please see README.md and LICENSE.txt for more information
 */
 
 use crate::sql::get_baguettes_data::get_all_baguettes_data;
+use crate::sql::settings::{edit_setting, get_setting};
 use crate::utils::paginate::{get_first_page_embed, get_pages, paginate_embed_message};
 use crate::{Data, Error};
 use futures::StreamExt;
@@ -15,12 +16,27 @@ pub async fn update_channel(
     ctx: &serenity::Context,
     data: &Data,
 ) -> Result<(), Error> {
-    let channel_id = 0;
-    let message_id = 1486020752393240750;
+    let channel_id: u64 = get_setting(guild_id, "leaderboard_channel", data)
+        .await?
+        .parse()
+        .unwrap_or_default();
+    let mut message_id: u64 = get_setting(guild_id, "leaderboard_message", data)
+        .await?
+        .parse()
+        .unwrap_or_default();
 
     if channel_id != 0 {
         let leaderboard_channel = serenity::ChannelId::new(channel_id);
         let http = ctx.http();
+
+        if message_id == 0 {
+            let msg = leaderboard_channel
+                .say(&http, "Generating Leaderboard...")
+                .await?;
+            message_id = msg.id.get();
+            edit_setting(guild_id, "leaderboard_message", message_id, data).await?;
+        }
+
         let mut messages = leaderboard_channel.messages_iter(&http).boxed();
 
         let mut leaderboard_msg = leaderboard_channel.message(&ctx.http, message_id).await?;
@@ -40,6 +56,7 @@ pub async fn update_channel(
         let (embed, components) = get_first_page_embed(&pages, None, channel_id).await?;
 
         let msg_edit = serenity::EditMessage::new()
+            .content("")
             .embed(embed)
             .components(vec![components]);
         leaderboard_msg.edit(&ctx.http, msg_edit).await?;

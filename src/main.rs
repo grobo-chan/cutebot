@@ -51,7 +51,7 @@ async fn on_error(error: poise::FrameworkError<'_, Data, Error>) {
 }
 
 async fn background_task(data: Arc<Data>) {
-    let mut interval = tokio::time::interval(Duration::from_secs(24 * 60 * 60));
+    let mut interval = tokio::time::interval(Duration::from_hours(24));
     // let mut interval = tokio::time::interval(Duration::from_secs(10));
 
     loop {
