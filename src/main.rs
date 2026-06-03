@@ -90,6 +90,14 @@ async fn main() {
         .await
         .expect("Couldn't run database migrations");
 
+    let prefix = {
+        if env::var("MODE").unwrap_or("testing".into()) == "testing".to_string() {
+            "?".to_string()
+        } else {
+            "!".to_string()
+        }
+    };
+
     let framework = poise::Framework::builder()
         .options(poise::FrameworkOptions {
             commands: vec![
@@ -104,7 +112,7 @@ async fn main() {
                 commands::settings::settings(),
             ],
             prefix_options: poise::PrefixFrameworkOptions {
-                prefix: Some("!".into()),
+                prefix: Some(prefix),
                 ..Default::default()
             },
             event_handler: |ctx, event, framework, data| {

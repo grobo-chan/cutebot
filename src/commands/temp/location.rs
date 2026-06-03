@@ -58,6 +58,9 @@ pub async fn location(ctx: Context<'_>, city: String) -> Result<(), Error> {
                     .unwrap_or_else(|| ctx.author().default_avatar_url()),
             );
 
+    let embed_footer =
+        serenity::CreateEmbedFooter::new("The following data was fetched via OpenWeather's API.");
+
     let embed = serenity::CreateEmbed::new()
         .author(embed_author)
         .colour(serenity::Colour::DARK_MAGENTA)
@@ -65,7 +68,8 @@ pub async fn location(ctx: Context<'_>, city: String) -> Result<(), Error> {
         .description(format!(
             "The temperature in {} is:\n- {}°C\n- {}°F\n- {} R\n- {} K\n- {} r\nWith a wind speed of {} m/s and {}% Humidity",
             body.name, temp.celsius, temp.fahrenheit, temp.rankine, temp.kelvin, temp.reaumur, body.wind.speed, body.main.humidity
-        ));
+        ))
+        .footer(embed_footer);
     let reply = poise::CreateReply::default().embed(embed);
     ctx.send(reply).await?;
 
