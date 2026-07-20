@@ -30,6 +30,7 @@ async fn autocomplete<'a>(_ctx: Context<'_>, partial: &'a str) -> impl Stream<It
         "landmine_immunity_role",
         "gambling_enabled",
         "daily_baguettes",
+        "america_mode",
     ])
     .filter(move |name| futures::future::ready(name.starts_with(partial)))
     .map(|name| name.to_string())

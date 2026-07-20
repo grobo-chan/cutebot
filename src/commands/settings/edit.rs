@@ -113,6 +113,34 @@ pub async fn edit(
                 .colour(serenity::Colour::RED)
                 .description("Please select an integer."),
         },
+        "america_mode" => match new_setting.to_lowercase().as_str() {
+            "yes" | "y" | "true" => {
+                edit_setting(server_id, &option, true, &ctx.data()).await?;
+
+                serenity::CreateEmbed::new()
+                    .author(embed_author)
+                    .colour(serenity::Colour::DARK_GREEN)
+                    .description(
+                        "AMERICA MODE HAS NOW BEEN ENABLED. RAHHHHHHH 🇺🇸🇺🇸🇺🇸🇺🇸🇺🇸🦅🦅🦅🦅🦅",
+                    )
+                    .footer(serenity::CreateEmbedFooter::new(
+                        "This hell is still being programmed.",
+                    ))
+            }
+            "no" | "n" | "false" => {
+                edit_setting(server_id, &option, false, &ctx.data()).await?;
+
+                serenity::CreateEmbed::new()
+                    .author(embed_author)
+                    .colour(serenity::Colour::DARK_GREEN)
+                    .description("America mode is now disabled!")
+                    .footer(serenity::CreateEmbedFooter::new("Good choice."))
+            }
+            _ => serenity::CreateEmbed::new()
+                .author(embed_author)
+                .colour(serenity::Colour::RED)
+                .description("Please pick either 'yes' or 'no'."),
+        },
         _ => serenity::CreateEmbed::new()
             .author(embed_author)
             .colour(serenity::Colour::RED)

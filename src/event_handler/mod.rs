@@ -19,8 +19,17 @@ use crate::{Data, Error};
 
 use poise::serenity_prelude as serenity;
 use rand::prelude::*;
+use std::env;
+use std::sync::LazyLock;
 
-const CGAHQ_BOT_ID: u64 = 1468954832764276856;
+static CGAHQ_BOT_ID: LazyLock<u64> = LazyLock::new(|| {
+    let mode = env::var("MODE").unwrap_or_default().to_lowercase();
+    if mode == "testing" {
+        1526111033612177408
+    } else {
+        1468954832764276856
+    }
+});
 
 async fn msg_has_keywords(msg: &String, keywords: Vec<&str>) -> Result<bool, Error> {
     Ok(keywords.iter().any(|&x| {
@@ -44,7 +53,7 @@ pub async fn event_handler(
             println!("Logged in as {}", data_about_bot.user.name);
         }
         serenity::FullEvent::Message { new_message } => {
-            if new_message.author.id.get() == CGAHQ_BOT_ID {
+            if new_message.author.id.get() == *CGAHQ_BOT_ID {
                 troll_cgahq_bot(&new_message, &ctx).await?;
             }
 

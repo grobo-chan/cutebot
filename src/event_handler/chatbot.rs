@@ -14,7 +14,7 @@ pub async fn chatbot(
     new_message: &serenity::Message,
     ctx: &serenity::Context,
 ) -> Result<(), Error> {
-    let cgahq_bot = serenity::UserId::new(CGAHQ_BOT_ID);
+    let cgahq_bot = serenity::UserId::new(*CGAHQ_BOT_ID);
 
     if msg_has_keywords(
         &new_message.content,

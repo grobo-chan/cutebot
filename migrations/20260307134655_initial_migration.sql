@@ -8,6 +8,8 @@ CREATE TABLE servers (
     landmine_channel INTEGER,
     landmine_immunity_role INTEGER,
     gambling_enabled INTEGER NOT NULL DEFAULT 0 CHECK(gambling_enabled IN (0,1)),
+    america_mode INTEGER NOT NULL DEFAULT 0 CHECK(america_mode IN (0,1)),
+    golden_baguettes INTEGER NOT NULL DEFAULT 0,
     daily_baguettes INTEGER NOT NULL DEFAULT 1
 );
 
@@ -15,6 +17,7 @@ CREATE TABLE balance (
     user_id INTEGER NOT NULL,
     server_id INTEGER NOT NULL,
     baguettes INTEGER NOT NULL,
+    oven_tier INTEGER NOT NULL DEFAULT 1,
     PRIMARY KEY (user_id, server_id)
     FOREIGN KEY (server_id) REFERENCES servers (server_id)
 );

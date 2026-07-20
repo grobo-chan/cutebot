@@ -16,7 +16,7 @@ pub async fn reset_server(
     http: &serenity::all::Http,
 ) -> Result<(), Error> {
     let mut settings_query_builder: QueryBuilder<Sqlite> = QueryBuilder::new(format!(
-        "INSERT OR IGNORE INTO servers VALUES ({}, NULL, NULL, NULL, NULL, 0, 1);",
+        "INSERT OR IGNORE INTO servers (server_id) VALUES ({});",
         guild_id.get()
     ));
 
