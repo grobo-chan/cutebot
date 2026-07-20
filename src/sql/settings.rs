@@ -5,7 +5,7 @@ Please see README.md and LICENSE.txt for more information
 
 use poise::serenity_prelude as serenity;
 use sqlx::query_builder::QueryBuilder;
-use sqlx::{Row, Sqlite};
+use sqlx::{Column, Row, Sqlite};
 
 use crate::{Data, Error};
 
@@ -42,5 +42,30 @@ pub async fn get_setting(
     let row = get_query_builder.build().fetch_one(&data.database).await?;
 
     let result = row.try_get::<String, &str>(setting).unwrap_or_default();
+    Ok(result)
+}
+
+pub async fn get_all_settings(
+    guild_id: serenity::GuildId,
+    data: &Data,
+) -> Result<Vec<[String; 2]>, Error> {
+    let mut get_query_builder: QueryBuilder<Sqlite> = QueryBuilder::new(format!(
+        "SELECT * FROM servers WHERE server_id = {0};",
+        guild_id.get()
+    ));
+
+    let row = get_query_builder.build().fetch_one(&data.database).await?;
+    let result: Vec<[String; 2]> = row
+        .columns()
+        .iter()
+        .map(|x| {
+            [
+                x.name().to_string(),
+                row.try_get_unchecked::<String, &str>(x.name())
+                    .unwrap_or_default(),
+            ]
+        })
+        .collect();
+
     Ok(result)
 }

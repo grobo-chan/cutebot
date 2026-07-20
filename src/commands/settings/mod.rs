@@ -5,9 +5,11 @@ Please see README.md and LICENSE.txt for more information
 
 mod edit;
 mod get;
+mod get_all;
 
 use crate::commands::settings::edit::edit;
 use crate::commands::settings::get::get;
+use crate::commands::settings::get_all::get_all;
 use crate::{Context, Error};
 use futures::{Stream, StreamExt};
 
@@ -16,7 +18,7 @@ use futures::{Stream, StreamExt};
     slash_command,
     prefix_command,
     required_permissions = "MANAGE_GUILD",
-    subcommands("edit", "get"),
+    subcommands("edit", "get", "get_all"),
     subcommand_required
 )]
 pub async fn settings(_: Context<'_>) -> Result<(), Error> {
