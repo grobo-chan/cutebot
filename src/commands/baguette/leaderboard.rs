@@ -34,6 +34,7 @@ pub async fn leaderboard(ctx: Context<'_>) -> Result<(), Error> {
             &ctx.serenity_context(),
             &pages,
             Some(author.clone()),
+            true,
             ctx.id(),
         )
         .await?;

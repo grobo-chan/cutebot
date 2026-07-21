@@ -61,7 +61,7 @@ pub async fn update_channel(
             .components(vec![components]);
         leaderboard_msg.edit(&ctx.http, msg_edit).await?;
 
-        paginate_embed_message(&ctx, &pages, None, channel_id).await?;
+        paginate_embed_message(&ctx, &pages, None, false, channel_id).await?;
     }
 
     Ok(())

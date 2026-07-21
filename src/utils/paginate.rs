@@ -4,6 +4,7 @@ Please see README.md and LICENSE.txt for more information
 */
 
 use crate::Error;
+use futures::StreamExt;
 use poise::serenity_prelude as serenity;
 
 pub async fn get_pages<T: std::fmt::Display, U: std::fmt::Display>(
@@ -53,6 +54,7 @@ pub async fn paginate_embed_message(
     ctx: &serenity::Context,
     pages: &Vec<String>,
     embed_author: Option<serenity::CreateEmbedAuthor>,
+    timeout: bool,
     ctx_id: u64,
 ) -> Result<(), Error> {
     let prev_button_id = format!("{}prev", ctx_id.clone());
@@ -62,14 +64,17 @@ pub async fn paginate_embed_message(
 
     // Loop through incoming interactions with the navigation buttons
     let mut current_page = 0;
-    while let Some(press) = serenity::collector::ComponentInteractionCollector::new(ctx)
+    let mut collector = serenity::collector::ComponentInteractionCollector::new(ctx)
         // We defined our button IDs to start with `ctx_id`. If they don't, some other command's
         // button was pressed
-        .filter(move |press| press.data.custom_id.starts_with(&ctx_id.to_string()))
+        .filter(move |press| press.data.custom_id.starts_with(&ctx_id.to_string()));
+    if timeout {
         // Timeout when no navigation button has been pressed for 24 hours
-        .timeout(tokio::time::Duration::from_secs(3600 * 24))
-        .await
-    {
+        collector = collector.timeout(tokio::time::Duration::from_secs(3600 * 24))
+    }
+
+    let mut stream = collector.stream();
+    while let Some(press) = stream.next().await {
         // Depending on which button was pressed, go to next or previous page
         if press.data.custom_id == next_button_id {
             current_page += 1;
