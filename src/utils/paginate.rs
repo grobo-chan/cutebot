@@ -89,17 +89,25 @@ pub async fn paginate_embed_message(
             continue;
         }
 
+        let components = serenity::CreateActionRow::Buttons(vec![
+            serenity::CreateButton::new(&prev_button_id).emoji('◀'),
+            serenity::CreateButton::new(&next_button_id).emoji('▶'),
+        ]);
+
         // Update the message with the new page contents
         press
             .create_response(
                 ctx,
                 serenity::CreateInteractionResponse::UpdateMessage(
-                    serenity::CreateInteractionResponseMessage::new().embed(
-                        serenity::CreateEmbed::new()
-                            .description(&pages[current_page])
-                            .title("Leaderboard")
-                            .author(author.clone()),
-                    ),
+                    serenity::CreateInteractionResponseMessage::new()
+                        .embed(
+                            serenity::CreateEmbed::new()
+                                .description(&pages[current_page])
+                                .title("Leaderboard")
+                                .color(random_color().await?)
+                                .author(author.clone()),
+                        )
+                        .components(vec![components]),
                 ),
             )
             .await?;
