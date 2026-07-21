@@ -34,14 +34,16 @@ pub async fn get_setting(
     data: &Data,
 ) -> Result<String, Error> {
     let mut get_query_builder: QueryBuilder<Sqlite> = QueryBuilder::new(format!(
-        "SELECT CAST({0} AS TEXT) AS {0} FROM servers WHERE server_id = {1};",
+        "SELECT {0} FROM servers WHERE server_id = {1};",
         setting,
         guild_id.get()
     ));
 
     let row = get_query_builder.build().fetch_one(&data.database).await?;
 
-    let result = row.try_get::<String, &str>(setting).unwrap_or_default();
+    let result = row
+        .try_get_unchecked::<String, &str>(setting)
+        .unwrap_or_default();
     Ok(result)
 }
 
@@ -64,6 +66,10 @@ pub async fn get_all_settings(
                 row.try_get_unchecked::<String, &str>(x.name())
                     .unwrap_or_default(),
             ]
+        })
+        .filter(|x| {
+            let non_settings = vec!["server_id", "leaderboard_message", "golden_baguettes"];
+            non_settings.iter().all(|&y| y != x[0])
         })
         .collect();
 

@@ -62,8 +62,14 @@ pub async fn get(
                 .colour(serenity::Colour::DARK_GREEN)
                 .description(description)
         }
-        "gambling_enabled" => {
-            let gambling_enabled = if value == "1".to_string() {
+        "gambling_enabled" | "america_mode" => {
+            let option_name = match option.to_lowercase().as_str() {
+                "gambling_enabled" => "Gambling",
+                "america_mode" => "America mode",
+                _ => "",
+            };
+
+            let is_enabled = if value == "1".to_string() {
                 "enabled"
             } else {
                 "disabled"
@@ -72,7 +78,7 @@ pub async fn get(
             serenity::CreateEmbed::new()
                 .author(embed_author)
                 .colour(serenity::Colour::DARK_GREEN)
-                .description(format!("Gambling is {}", gambling_enabled))
+                .description(format!("{} is {}", option_name, is_enabled))
         }
         "daily_baguettes" => {
             let daily_baguettes: i32 = value.parse().unwrap();
