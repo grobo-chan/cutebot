@@ -3,6 +3,7 @@ Copyright (C) 2026 GroboChan
 Please see README.md and LICENSE.txt for more information
 */
 
+use crate::utils::random_color::random_color;
 use crate::{Context, Error};
 use poise::serenity_prelude as serenity;
 
@@ -52,7 +53,7 @@ pub async fn eight_ball(ctx: Context<'_>, question: String) -> Result<(), Error>
 
     let embed = CreateEmbed::new()
         .author(embed_author)
-        .colour(serenity::Colour::DARK_GREEN)
+        .colour(random_color().await?)
         .description(format!(
             "**Question:** {}\n **8-Ball Says:** {}",
             question, answer

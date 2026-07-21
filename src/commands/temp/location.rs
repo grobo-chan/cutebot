@@ -5,6 +5,7 @@ Please see README.md and LICENSE.txt for more information
 
 use crate::commands::temp::Temp;
 use crate::utils::conversions;
+use crate::utils::random_color::random_color;
 use crate::{Context, Error};
 use poise::serenity_prelude as serenity;
 use serde::Deserialize;
@@ -63,7 +64,7 @@ pub async fn location(ctx: Context<'_>, city: String) -> Result<(), Error> {
 
     let embed = serenity::CreateEmbed::new()
         .author(embed_author)
-        .colour(serenity::Colour::DARK_MAGENTA)
+        .colour(random_color().await?)
         .title("Temperature")
         .description(format!(
             "The temperature in {} is:\n- {}°C\n- {}°F\n- {} R\n- {} K\n- {} r\nWith a wind speed of {} m/s and {}% Humidity",

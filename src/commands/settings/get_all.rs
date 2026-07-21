@@ -84,6 +84,7 @@ pub async fn get_all(ctx: Context<'_>) -> Result<(), Error> {
     let embed = serenity::CreateEmbed::new()
         .author(embed_author)
         .title("Settings")
+        .colour(serenity::Colour::DARK_GREEN)
         .description(description);
 
     let reply = poise::CreateReply::default().embed(embed);

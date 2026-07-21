@@ -3,7 +3,7 @@ Copyright (C) 2026 GroboChan
 Please see README.md and LICENSE.txt for more information
 */
 
-use crate::Error;
+use crate::{Error, utils::random_color::random_color};
 use futures::StreamExt;
 use poise::serenity_prelude as serenity;
 
@@ -45,6 +45,7 @@ pub async fn get_first_page_embed(
     let embed = serenity::CreateEmbed::default()
         .description(&pages[0])
         .title("Leaderboard")
+        .color(random_color().await?)
         .author(author.clone());
 
     return Ok((embed, components));

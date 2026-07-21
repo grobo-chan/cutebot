@@ -8,6 +8,7 @@ use crate::commands::temp::convert::TempAutocomplete::{
     Celsius, Fahrenheit, Kelvin, Rankine, Reaumur,
 };
 use crate::utils::conversions;
+use crate::utils::random_color::random_color;
 use crate::{Context, Error};
 
 use poise::serenity_prelude as serenity;
@@ -100,7 +101,7 @@ pub async fn convert(ctx: Context<'_>, number: f32, unit: TempAutocomplete) -> R
 
     let embed = serenity::CreateEmbed::new()
         .author(embed_author)
-        .colour(serenity::Colour::DARK_MAGENTA)
+        .colour(random_color().await?)
         .title("Temperature")
         .description(format!(
             "The temperature is:\n- {}°C\n- {}°F\n- {} R\n- {} K\n- {} r\n{}",

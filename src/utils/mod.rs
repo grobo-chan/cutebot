@@ -7,5 +7,6 @@ pub mod conversions;
 pub mod fetch_emote;
 pub mod paginate;
 pub mod processor;
+pub mod random_color;
 pub mod token;
 pub mod tokenizer;

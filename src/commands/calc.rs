@@ -4,6 +4,7 @@ Please see README.md and LICENSE.txt for more information
 */
 
 use crate::utils::processor::processor;
+use crate::utils::random_color::random_color;
 use crate::{Context, Error};
 
 use poise::serenity_prelude as serenity;
@@ -24,7 +25,7 @@ pub async fn calc(ctx: Context<'_>, expr: String) -> Result<(), Error> {
 
     let embed = CreateEmbed::new()
         .author(embed_author)
-        .colour(serenity::Colour::DARK_MAGENTA)
+        .colour(random_color().await?)
         .title("Calculation Complete!")
         .description(format!("The result is: {}", result.await));
 
