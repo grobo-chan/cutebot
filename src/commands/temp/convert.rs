@@ -4,26 +4,36 @@ Please see README.md and LICENSE.txt for more information
 */
 
 use crate::commands::temp::Temp;
+use crate::commands::temp::convert::TempAutocomplete::{
+    Celsius, Fahrenheit, Kelvin, Rankine, Reaumur,
+};
 use crate::utils::conversions;
 use crate::{Context, Error};
 
-use futures::{Stream, StreamExt};
 use poise::serenity_prelude as serenity;
-use serenity::builder::CreateEmbed;
 
-async fn autocomplete<'a>(_ctx: Context<'_>, partial: &'a str) -> impl Stream<Item = String> {
-    futures::stream::iter(&["Celsius", "Fahrenheit", "Rankine", "Kelvin", "Reaumur"])
-        .filter(move |name| futures::future::ready(name.starts_with(partial)))
-        .map(|name| name.to_string())
+#[derive(poise::ChoiceParameter)]
+pub enum TempAutocomplete {
+    #[name = "Celsius"]
+    #[name = "C"]
+    Celsius,
+    #[name = "Fahrenheit"]
+    #[name = "F"]
+    Fahrenheit,
+    #[name = "Rankine"]
+    #[name = "R"]
+    Rankine,
+    #[name = "Kelvin"]
+    #[name = "K"]
+    Kelvin,
+    #[name = "Reaumur"]
+    #[name = "Re"]
+    Reaumur,
 }
 
 /// Converts temperatures to show up in other units
 #[poise::command(slash_command, prefix_command)]
-pub async fn convert(
-    ctx: Context<'_>,
-    number: f32,
-    #[autocomplete = "autocomplete"] unit: String,
-) -> Result<(), Error> {
+pub async fn convert(ctx: Context<'_>, number: f32, unit: TempAutocomplete) -> Result<(), Error> {
     let mut temp = Temp {
         celsius: 0.0,
         fahrenheit: 0.0,
@@ -32,45 +42,41 @@ pub async fn convert(
         reaumur: 0.0,
     };
 
-    let mut invalid = false;
-    match unit.to_lowercase().as_str() {
-        "celsius" | "c" => {
+    match unit {
+        Celsius => {
             temp.celsius = number;
             temp.fahrenheit = conversions::celsius::to_fahrenheit(number);
             temp.rankine = conversions::celsius::to_rankine(number);
             temp.kelvin = conversions::celsius::to_kelvin(number);
             temp.reaumur = conversions::celsius::to_reaumur(number);
         }
-        "fahrenheit" | "f" => {
+        Fahrenheit => {
             temp.celsius = conversions::fahrenheit::to_celsius(number);
             temp.fahrenheit = number;
             temp.rankine = conversions::fahrenheit::to_rankine(number);
             temp.kelvin = conversions::fahrenheit::to_kelvin(number);
             temp.reaumur = conversions::fahrenheit::to_reaumur(number);
         }
-        "rankine" | "r" => {
+        Rankine => {
             temp.celsius = conversions::rankine::to_celsius(number);
             temp.fahrenheit = conversions::rankine::to_fahrenheit(number);
             temp.rankine = number;
             temp.kelvin = conversions::rankine::to_kelvin(number);
             temp.reaumur = conversions::rankine::to_reaumur(number);
         }
-        "kelvin" | "k" => {
+        Kelvin => {
             temp.celsius = conversions::kelvin::to_celsius(number);
             temp.fahrenheit = conversions::kelvin::to_fahrenheit(number);
             temp.rankine = conversions::kelvin::to_rankine(number);
             temp.kelvin = number;
             temp.reaumur = conversions::kelvin::to_reaumur(number);
         }
-        "reaumur" | "re" => {
+        Reaumur => {
             temp.celsius = conversions::reaumur::to_celsius(number);
             temp.fahrenheit = conversions::reaumur::to_fahrenheit(number);
             temp.rankine = conversions::reaumur::to_rankine(number);
             temp.kelvin = conversions::reaumur::to_kelvin(number);
             temp.reaumur = number;
-        }
-        _ => {
-            invalid = true;
         }
     };
 
@@ -82,37 +88,26 @@ pub async fn convert(
                     .unwrap_or_else(|| ctx.author().default_avatar_url()),
             );
 
-    if !invalid {
-        let note = {
-            if temp.kelvin < 0.0 {
-                "Note: This temperature is below 0 K. Zero Kelvin is the absolute zero, the hypothetical temperature at which the atoms themself stop moving. From the third law of thermodynamics it is impossible to reach it with finite steps."
-            } else if temp.kelvin > 1.4e32 {
-                "Note: This temperature is above 1.4 × 10³²K. The Planck Temperature is the theoretical maximum temperature possible given our current understanding of physics. Over that temperature the thermal radiation wavelength would be smaller than the Planck Length, the smallest allowed length in our current model of physics"
-            } else {
-                ""
-            }
-        };
+    let note = {
+        if temp.kelvin < 0.0 {
+            "Note: This temperature is below 0 K. Zero Kelvin is the absolute zero, the hypothetical temperature at which the atoms themself stop moving. From the third law of thermodynamics it is impossible to reach it with finite steps."
+        } else if temp.kelvin > 1.4e32 {
+            "Note: This temperature is above 1.4 × 10³²K. The Planck Temperature is the theoretical maximum temperature possible given our current understanding of physics. Over that temperature the thermal radiation wavelength would be smaller than the Planck Length, the smallest allowed length in our current model of physics"
+        } else {
+            ""
+        }
+    };
 
-        let embed = serenity::CreateEmbed::new()
-            .author(embed_author)
-            .colour(serenity::Colour::DARK_MAGENTA)
-            .title("Temperature")
-            .description(format!(
-                "The temperature is:\n- {}°C\n- {}°F\n- {} R\n- {} K\n- {} r\n{}",
-                temp.celsius, temp.fahrenheit, temp.rankine, temp.kelvin, temp.reaumur, note
-            ));
-        let reply = poise::CreateReply::default().embed(embed);
-        ctx.send(reply).await?;
-    } else {
-        let embed = CreateEmbed::new()
-            .author(embed_author)
-            .colour(serenity::Colour::RED)
-            .title("Error")
-            .description("Invalid Unit");
-
-        let reply = poise::CreateReply::default().embed(embed);
-        ctx.send(reply).await?;
-    }
+    let embed = serenity::CreateEmbed::new()
+        .author(embed_author)
+        .colour(serenity::Colour::DARK_MAGENTA)
+        .title("Temperature")
+        .description(format!(
+            "The temperature is:\n- {}°C\n- {}°F\n- {} R\n- {} K\n- {} r\n{}",
+            temp.celsius, temp.fahrenheit, temp.rankine, temp.kelvin, temp.reaumur, note
+        ));
+    let reply = poise::CreateReply::default().embed(embed);
+    ctx.send(reply).await?;
 
     Ok(())
 }
