@@ -3,7 +3,10 @@ Copyright (C) 2026 GroboChan
 Please see README.md and LICENSE.txt for more information
 */
 
-use crate::commands::settings::autocomplete;
+use crate::commands::settings::SettingsAutocomplete::{
+    self, AmericaModeEnabled, DailyBaguettes, GamblingEnabled, LandmineChannel,
+    LandmineImmunityRole, LeaderboardChannel,
+};
 use crate::sql::settings::get_setting;
 use crate::{Context, Error};
 
@@ -12,10 +15,7 @@ use serenity::all::Mentionable;
 
 /// Gets value of a setting
 #[poise::command(slash_command, prefix_command)]
-pub async fn get(
-    ctx: Context<'_>,
-    #[autocomplete = "autocomplete"] option: String,
-) -> Result<(), Error> {
+pub async fn get(ctx: Context<'_>, option: SettingsAutocomplete) -> Result<(), Error> {
     let embed_author =
         serenity::CreateEmbedAuthor::new(&format!("Requested by: {}", ctx.author().display_name()))
             .icon_url(
@@ -24,13 +24,20 @@ pub async fn get(
                     .unwrap_or_else(|| ctx.author().default_avatar_url()),
             );
     let server_id = ctx.guild_id().expect("Not in a server!");
-    let value = get_setting(server_id, &option, &ctx.data()).await?;
 
-    let embed = match option.to_lowercase().as_str() {
-        "leaderboard_channel" | "landmine_channel" => {
-            let option_name = match option.to_lowercase().as_str() {
-                "leaderboard_channel" => "Leaderboard Channel",
-                "landmine_channel" => "Landmine Channel",
+    let embed = match option {
+        LeaderboardChannel | LandmineChannel => {
+            let db_name = match option {
+                LeaderboardChannel => "leaderboard_channel",
+                LandmineChannel => "landmine_channel",
+                _ => "",
+            };
+
+            let value = get_setting(server_id, db_name, &ctx.data()).await?;
+
+            let option_name = match option {
+                LeaderboardChannel => "Leaderboard Channel",
+                LandmineChannel => "Landmine Channel",
                 _ => "",
             };
 
@@ -46,7 +53,8 @@ pub async fn get(
                 .colour(serenity::Colour::DARK_GREEN)
                 .description(description)
         }
-        "landmine_immunity_role" => {
+        LandmineImmunityRole => {
+            let value = get_setting(server_id, "landmine_immunity_role", &ctx.data()).await?;
             let description = if value != "" {
                 let role_id = serenity::RoleId::new(value.parse().unwrap());
                 format!(
@@ -62,10 +70,18 @@ pub async fn get(
                 .colour(serenity::Colour::DARK_GREEN)
                 .description(description)
         }
-        "gambling_enabled" | "america_mode" => {
-            let option_name = match option.to_lowercase().as_str() {
-                "gambling_enabled" => "Gambling",
-                "america_mode" => "America mode",
+        GamblingEnabled | AmericaModeEnabled => {
+            let db_name = match option {
+                GamblingEnabled => "gambling_enabled",
+                AmericaModeEnabled => "america_mode",
+                _ => "",
+            };
+
+            let value = get_setting(server_id, db_name, &ctx.data()).await?;
+
+            let option_name = match option {
+                GamblingEnabled => "Gambling",
+                AmericaModeEnabled => "America mode",
                 _ => "",
             };
 
@@ -80,7 +96,8 @@ pub async fn get(
                 .colour(serenity::Colour::DARK_GREEN)
                 .description(format!("{} is {}", option_name, is_enabled))
         }
-        "daily_baguettes" => {
+        DailyBaguettes => {
+            let value = get_setting(server_id, "daily_baguettes", &ctx.data()).await?;
             let daily_baguettes: i32 = value.parse().unwrap();
 
             serenity::CreateEmbed::new()
@@ -91,10 +108,6 @@ pub async fn get(
                     daily_baguettes
                 ))
         }
-        _ => serenity::CreateEmbed::new()
-            .author(embed_author)
-            .colour(serenity::Colour::RED)
-            .description("Invalid option was provided!"),
     };
 
     let reply = poise::CreateReply::default().embed(embed);

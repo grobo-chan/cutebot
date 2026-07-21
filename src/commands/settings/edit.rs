@@ -3,7 +3,10 @@ Copyright (C) 2026 GroboChan
 Please see README.md and LICENSE.txt for more information
 */
 
-use crate::commands::settings::autocomplete;
+use crate::commands::settings::SettingsAutocomplete::{
+    self, AmericaModeEnabled, DailyBaguettes, GamblingEnabled, LandmineChannel,
+    LandmineImmunityRole, LeaderboardChannel,
+};
 use crate::sql::settings::edit_setting;
 use crate::{Context, Error};
 
@@ -15,7 +18,7 @@ use serenity::utils::{parse_channel_mention, parse_role_mention};
 #[poise::command(slash_command, prefix_command)]
 pub async fn edit(
     ctx: Context<'_>,
-    #[autocomplete = "autocomplete"] option: String,
+    option: SettingsAutocomplete,
     new_setting: String,
 ) -> Result<(), Error> {
     let embed_author =
@@ -27,19 +30,25 @@ pub async fn edit(
             );
     let server_id = ctx.guild_id().expect("Not in a server!");
 
-    let embed = match option.to_lowercase().as_str() {
-        "leaderboard_channel" | "landmine_channel" => {
+    let embed = match option {
+        LeaderboardChannel | LandmineChannel => {
             let channel_id = parse_channel_mention(new_setting.as_str());
             match channel_id {
                 Some(c) => {
-                    edit_setting(server_id, &option, c.get(), &ctx.data()).await?;
-                    if option.to_lowercase() == "leaderboard_channel" {
+                    let db_name = match option {
+                        LeaderboardChannel => "leaderboard_channel",
+                        LandmineChannel => "landmine_channel",
+                        _ => "",
+                    };
+
+                    edit_setting(server_id, db_name, c.get(), &ctx.data()).await?;
+                    if db_name == "leaderboard_channel" {
                         edit_setting(server_id, "leaderboard_message", 0, &ctx.data()).await?;
                     }
 
-                    let option_name = match option.to_lowercase().as_str() {
-                        "leaderboard_channel" => "Leaderboard Channel",
-                        "landmine_channel" => "Landmine Channel",
+                    let option_name = match option {
+                        LeaderboardChannel => "Leaderboard Channel",
+                        LandmineChannel => "Landmine Channel",
                         _ => "",
                     };
 
@@ -54,11 +63,11 @@ pub async fn edit(
                     .description("Invalid channel id was provided!"),
             }
         }
-        "landmine_immunity_role" => {
+        LandmineImmunityRole => {
             let role_id = parse_role_mention(new_setting.as_str());
             match role_id {
                 Some(r) => {
-                    edit_setting(server_id, &option, r.get(), &ctx.data()).await?;
+                    edit_setting(server_id, "landmine_immunity_role", r.get(), &ctx.data()).await?;
 
                     serenity::CreateEmbed::new()
                         .author(embed_author)
@@ -74,9 +83,9 @@ pub async fn edit(
                     .description("Invalid role id was provided!"),
             }
         }
-        "gambling_enabled" => match new_setting.to_lowercase().as_str() {
+        GamblingEnabled => match new_setting.to_lowercase().as_str() {
             "yes" | "y" | "true" => {
-                edit_setting(server_id, &option, true, &ctx.data()).await?;
+                edit_setting(server_id, "gambling_enabled", true, &ctx.data()).await?;
 
                 serenity::CreateEmbed::new()
                     .author(embed_author)
@@ -84,7 +93,7 @@ pub async fn edit(
                     .description("Gambling is now enabled!")
             }
             "no" | "n" | "false" => {
-                edit_setting(server_id, &option, false, &ctx.data()).await?;
+                edit_setting(server_id, "gambling_enabled", false, &ctx.data()).await?;
 
                 serenity::CreateEmbed::new()
                     .author(embed_author)
@@ -96,9 +105,9 @@ pub async fn edit(
                 .colour(serenity::Colour::RED)
                 .description("Please pick either 'yes' or 'no'."),
         },
-        "daily_baguettes" => match new_setting.parse::<i32>().ok() {
+        DailyBaguettes => match new_setting.parse::<i32>().ok() {
             Some(amount) => {
-                edit_setting(server_id, &option, amount, &ctx.data()).await?;
+                edit_setting(server_id, "daily_baguettes", amount, &ctx.data()).await?;
 
                 serenity::CreateEmbed::new()
                     .author(embed_author)
@@ -113,9 +122,9 @@ pub async fn edit(
                 .colour(serenity::Colour::RED)
                 .description("Please select an integer."),
         },
-        "america_mode" => match new_setting.to_lowercase().as_str() {
+        AmericaModeEnabled => match new_setting.to_lowercase().as_str() {
             "yes" | "y" | "true" => {
-                edit_setting(server_id, &option, true, &ctx.data()).await?;
+                edit_setting(server_id, "america_mode", true, &ctx.data()).await?;
 
                 serenity::CreateEmbed::new()
                     .author(embed_author)
@@ -128,7 +137,7 @@ pub async fn edit(
                     ))
             }
             "no" | "n" | "false" => {
-                edit_setting(server_id, &option, false, &ctx.data()).await?;
+                edit_setting(server_id, "america_mode", false, &ctx.data()).await?;
 
                 serenity::CreateEmbed::new()
                     .author(embed_author)
@@ -141,10 +150,6 @@ pub async fn edit(
                 .colour(serenity::Colour::RED)
                 .description("Please pick either 'yes' or 'no'."),
         },
-        _ => serenity::CreateEmbed::new()
-            .author(embed_author)
-            .colour(serenity::Colour::RED)
-            .description("Invalid option was provided!"),
     };
 
     let reply = poise::CreateReply::default().embed(embed);
