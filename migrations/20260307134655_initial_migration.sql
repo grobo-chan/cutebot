@@ -38,11 +38,10 @@ CREATE TABLE baguette_audit_log (
     action_id INTEGER PRIMARY KEY,
     server_id INTEGER NOT NULL,
     admin_id INTEGER NOT NULL,
-    user_id INTEGER NOT NULL,
+    user_id INTEGER,
     action STRING NOT NULL CHECK(action IN ("add_baguettes", "remove_baguettes", "set_baguettes")),
     amount INTEGER NOT NULL,
     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id, server_id) REFERENCES balance (user_id, server_id) ON DELETE CASCADE,
     FOREIGN KEY (admin_id, server_id) REFERENCES balance (user_id, server_id) ON DELETE CASCADE,
     FOREIGN KEY (server_id) REFERENCES servers (server_id)
 );

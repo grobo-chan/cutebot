@@ -68,6 +68,36 @@ pub async fn set_baguettes(
     Ok(())
 }
 
+pub async fn add_baguettes_to_all(
+    amount: u16,
+    server_id: serenity::GuildId,
+    data: &Data,
+) -> Result<(), Error> {
+    let mut query: QueryBuilder<Sqlite> = QueryBuilder::new(format!(
+        "UPDATE balance SET baguettes = baguettes + {amount} WHERE server_id = {server_id};",
+        amount = amount,
+        server_id = server_id.get()
+    ));
+
+    query.build().execute(&data.database).await?;
+    Ok(())
+}
+
+pub async fn remove_baguettes_from_all(
+    amount: u16,
+    server_id: serenity::GuildId,
+    data: &Data,
+) -> Result<(), Error> {
+    let mut query: QueryBuilder<Sqlite> = QueryBuilder::new(format!(
+        "UPDATE balance SET baguettes = baguettes - {amount} WHERE server_id = {server_id};",
+        amount = amount,
+        server_id = server_id.get()
+    ));
+
+    query.build().execute(&data.database).await?;
+    Ok(())
+}
+
 pub async fn perform_transaction(
     amount: u16,
     sender_id: serenity::UserId,
@@ -92,7 +122,7 @@ pub async fn perform_transaction(
 
 pub async fn log_action(
     amount: u16,
-    user_id: serenity::UserId,
+    user_id: Option<serenity::UserId>,
     admin_id: serenity::UserId,
     server_id: serenity::GuildId,
     action: String,
@@ -102,7 +132,7 @@ pub async fn log_action(
         "INSERT INTO baguette_audit_log (action_id, server_id, admin_id, user_id, action, amount) values ({action_id},{server_id},{admin_id},{user_id},'{action}',{amount});",
         amount = amount,
         admin_id = admin_id.get(),
-        user_id = user_id.get(),
+        user_id = user_id.map_or("NULL".to_string(), |v| v.get().to_string()),
         server_id = server_id.get(),
         action_id = rand::random::<u32>(),
         action = action
