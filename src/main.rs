@@ -54,6 +54,7 @@ async fn background_task(data: Arc<Data>) {
     let mut interval = tokio::time::interval(Duration::from_hours(24));
     // let mut interval = tokio::time::interval(Duration::from_secs(10));
 
+    interval.tick().await;
     loop {
         interval.tick().await;
         if let Err(e) = add_daily_baguettes(&Data {
